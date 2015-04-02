@@ -2,7 +2,9 @@ package Animation;
 
 import java.awt.*;
 import java.awt.geom.*;
-import java.util.Date;
+import java.util.Date; 
+
+import java.util.ArrayList;
 
 /*	trabalho para a avaliação de computação gráfica
 *	link : https://drive.google.com/drive/u/0/#folders/0B5YsmRIBzCHWT0wwWjFOc0pIdm8
@@ -10,16 +12,56 @@ import java.util.Date;
 *	@autor: Pablo Margreff
 *	última atualização: 28/03
 */
+
+private class Point {
+
+    public Point(int x, int y) {
+        this.x_ = x;
+        this.y_ = y;
+    }
+
+    public int get_x() {
+      return this.x_;
+    }
+
+    public int get_y() {
+      return this.y_;
+    }
+
+    public void set_x(int n) {
+      this.x_ = n;
+    }
+
+    public void set_y(int n) {
+      this.y_ = n;
+    }
+
+    private int x_;
+    private int y_;
+
+}
+
+
 public class Animation extends Frame
 {
 
   //Construtor
-  public Animation()
-  {
-    //Ativa o botão para fechar a Janela
+  public Animation(  int r, int s, int n  ) {
+
+    this.radius      = r;
+    this.segments    = s;
+    this.repetitions = n;
+
+    point_list = calculateBrasenham();
+
     addWindowListener(new MyFinishWindow());
+    
   }
 
+  private ArrayList<Point> calculateBrasenham() {
+
+
+  }
 
   public void paint(Graphics g)
   {
@@ -139,6 +181,11 @@ public class Animation extends Frame
     while( (new Date()).getTime() < finish ){}
   }
 
+
+  private int radius;     
+  private int segments;   
+  private int repetitions;
+  private ArrayList<Point> point_list;
 
   // public static void main(String[] argv)
   // {
