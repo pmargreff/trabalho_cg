@@ -1,9 +1,12 @@
-import Animation.*
+import Animation.*;
 
-public Class Main {
+public class Main {
 
 	public static void main(String[] argv) {
-
-		System.out.println("Hello World!");
-	}
+	    Animation tela = new Animation();
+	    tela.setTitle("Animation do quadrado mudando de forma por interpolacao de pontos");
+	    tela.setSize(600,300);
+	    tela.setVisible(true);
+  
+  }
 }

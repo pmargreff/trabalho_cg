@@ -10,11 +10,11 @@ import java.util.Date;
 *	@autor: Pablo Margreff
 *	última atualização: 28/03
 */
-public class Animacao extends Frame
+public class Animation extends Frame
 {
 
   //Construtor
-  public Animacao()
+  public Animation()
   {
     //Ativa o botão para fechar a Janela
     addWindowListener(new MyFinishWindow());
@@ -140,13 +140,13 @@ public class Animacao extends Frame
   }
 
 
-  public static void main(String[] argv)
-  {
-    Animacao tela = new Animacao();
-    tela.setTitle("Animation do quadrado mudando de forma por interpolacao de pontos");
-    tela.setSize(600,300);
-    tela.setVisible(true);
-  }
+  // public static void main(String[] argv)
+  // {
+  //   Animacao tela = new Animacao();
+  //   tela.setTitle("Animation do quadrado mudando de forma por interpolacao de pontos");
+  //   tela.setSize(600,300);
+  //   tela.setVisible(true);
+  // }
 
 }
 
