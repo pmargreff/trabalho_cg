@@ -159,6 +159,8 @@ public void paint(Graphics g) {
 
     int jump = (point_list.size() / segments);
 
+    System.out.format("Jump = %d\n", jump);
+
 
     //Shape usado para aplicar a transformação.
     Shape s;
@@ -174,6 +176,9 @@ public void paint(Graphics g) {
 
       int x_jump = point_list.get(j * jump).get_x();  
       int y_jump = point_list.get(j * jump).get_y();  
+
+
+      System.out.format("(x + jump = %d , y + jump  = %d)\n", x_jump, y_jump);
 
       AffineTransform rotation  = new AffineTransform(); // realmente preciso iniciar aqui?
       AffineTransform translate = new AffineTransform();
