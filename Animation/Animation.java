@@ -3,8 +3,10 @@ package Animation;
 import java.awt.*;
 import java.awt.geom.*;
 import java.util.Date; 
-
 import java.util.ArrayList;
+
+import Point.Point; // eu odeio java...
+
 
 /*	trabalho para a avaliação de computação gráfica
 *	link : https://drive.google.com/drive/u/0/#folders/0B5YsmRIBzCHWT0wwWjFOc0pIdm8
@@ -13,37 +15,9 @@ import java.util.ArrayList;
 *	última atualização: 28/03
 */
 
-private class Point {
 
-    public Point(int x, int y) {
-        this.x_ = x;
-        this.y_ = y;
-    }
-
-    public int get_x() {
-      return this.x_;
-    }
-
-    public int get_y() {
-      return this.y_;
-    }
-
-    public void set_x(int n) {
-      this.x_ = n;
-    }
-
-    public void set_y(int n) {
-      this.y_ = n;
-    }
-
-    private int x_;
-    private int y_;
-
-}
-
-
-public class Animation extends Frame
-{
+//public class Animation extends Frame
+public class Animation {
 
   //Construtor
   public Animation(  int r, int s, int n  ) {
@@ -54,86 +28,147 @@ public class Animation extends Frame
 
     point_list = calculateBrasenham();
 
-    addWindowListener(new MyFinishWindow());
+    //addWindowListener(new MyFinishWindow());
     
   }
 
+
+  // acho que essa classe ponto pode dar pau dps. Nao sei se precisa implementar o metodo tostring e 
+  //tals pra usar com o arraylist 
   private ArrayList<Point> calculateBrasenham() {
 
+      ArrayList<Point> left_half  = new ArrayList<Point>(); 
+      ArrayList<Point> rigth_half = new ArrayList<Point>();
+
+      int x = 0;
+      int y = radius;
+      int decision_var = 1 - radius;
+      
+      rigth_half.add( new Point(x, y) ); // eu acho que tem que ter ponto negativo.
+
+      while ( y > x ) {
+
+        x++;
+
+        if (decision_var < 0) {
+          decision_var += 2 * x + 3;
+        } else {
+
+          decision_var += 2 * ( x - y ) + 5;
+          y--;
+        }
+
+        rigth_half.add( new Point(x , y ) );  // entao ..      
+      }
+
+      // NOTE: Aparece um "erro", ou seja alguns pontos retrocedem e nao sao coerentes;
+
+      for (Point tmp : rigth_half ) {
+         left_half.add( 0,  new Point( tmp.get_y() , tmp.get_x() ));
+      }
+      
+      ArrayList<Point> final_list = new ArrayList<Point>();
+
+      for (Point tmp : left_half) {
+        final_list.add(0, new Point( -tmp.get_x(), tmp.get_y()) );
+      }
+
+      int size = rigth_half.size() - 1;
+
+      for (int i = size; i > 0; i-- ) {
+        final_list.add( new Point( -rigth_half.get(i).get_x() , rigth_half.get(i).get_y() ) );
+      }
+      
+      rigth_half.addAll(left_half);
+
+      final_list.addAll(rigth_half);
+
+
+      return final_list;
 
   }
 
-  public void paint(Graphics g)
-  {
+  public void debugg() {
 
-    Graphics2D g2d = (Graphics2D) g;
-    //Ativa o antialiasing
-    g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);
+    int i = 0;
 
-
-    int coordIniX, coordIniY, tamanhoQuad, tamanhoInicial, tamanhoFinal;
-    tamanhoInicial = 10;
-
-    coordIniX = 300;     //coordenada inicial no X
-    coordIniY = 150;     //coordenada inicial do Y
-    tamanhoQuad = tamanhoInicial;  //tamanho de quadrado recebe o tamanho inicial
-    //cria a elipse de acordo com as coordenadas iniciais e tamanho
-    Rectangle2D.Double quad = new Rectangle2D.Double(coordIniX,coordIniY,tamanhoQuad,tamanhoQuad);
-
-
-    //Ponto médio dos lados do quadrado
-    //é usado para definir o ponto central para a rotação
-    double xMed = coordIniX+tamanhoQuad/2.0;
-    double yMed = coordIniY+tamanhoQuad/2.0;
-
-
-    //Cria a rotação inical 0 graus a partir do ponto central.
-    AffineTransform transfInicial = new AffineTransform();
-    transfInicial.setToRotation(0,xMed,yMed); //rotação inicial
-
-    //Cria e o objeto inicial
-    double[] matrizInicial = new double[6];
-    transfInicial.getMatrix(matrizInicial);
-
-
-    //objetofinal
-    AffineTransform transfFinal = new AffineTransform();
-    transfFinal.setToTranslation(0,0); //posicao final, será um vetor
-    transfFinal.concatenate(mudaTamanho(xMed,yMed,1.5,1.5));//faz a mudança da escaĺa
-    transfFinal.rotate(Math.PI/4,xMed,yMed); //faz a rotação do objeto
-
-    //matriz para a transformação final
-    double[] matrizFinal = new double[6];
-    transfFinal.getMatrix(matrizFinal);
-
-
-    //Shape usado para aplicar a transformação.
-    Shape s;
-
-
-    //objeto que irá receber todos os passos intermediários da transformação
-    AffineTransform transfIntermed;
-
-    double passos = 200; //Number of passos as a Double-value in order 
-                                //to avoid repeated casting in the loop.
-    for (double i=0; i<=passos; i++)
-    {
-      //calcula a etapa da interpolação
-      transfIntermed = new AffineTransform(
-                  interpola(matrizInicial,matrizFinal,i/passos));
-
-      //transforma a o quadrado para o tipo shape, para poder aplicar as operações nessárias
-      s = transfIntermed.createTransformedShape(quad);
-
-      //delay para redesenhar
-      congela(50);
-
-      limpaJanela(g2d);
-
-      //redesenha
-      g2d.fill(s);
+    for (Point x : point_list) {
+      System.out.format("(x,y) = (%d, %d) \t %d\n", x.get_x(), x.get_y(), i++ );
     }
+
   }
+
+  // public void paint(Graphics g)
+  // {
+
+  //   Graphics2D g2d = (Graphics2D) g;
+  //   //Ativa o antialiasing
+  //   g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);
+
+
+  //   int coordIniX, coordIniY, tamanhoQuad, tamanhoInicial, tamanhoFinal;
+  //   tamanhoInicial = 10;
+
+  //   coordIniX = 300;     //coordenada inicial no X
+  //   coordIniY = 150;     //coordenada inicial do Y
+  //   tamanhoQuad = tamanhoInicial;  //tamanho de quadrado recebe o tamanho inicial
+  //   //cria a elipse de acordo com as coordenadas iniciais e tamanho
+  //   Rectangle2D.Double quad = new Rectangle2D.Double(coordIniX,coordIniY,tamanhoQuad,tamanhoQuad);
+
+
+  //   //Ponto médio dos lados do quadrado
+  //   //é usado para definir o ponto central para a rotação
+  //   double xMed = coordIniX+tamanhoQuad/2.0;
+  //   double yMed = coordIniY+tamanhoQuad/2.0;
+
+
+  //   //Cria a rotação inical 0 graus a partir do ponto central.
+  //   AffineTransform transfInicial = new AffineTransform();
+  //   transfInicial.setToRotation(0,xMed,yMed); //rotação inicial
+
+  //   //Cria e o objeto inicial
+  //   double[] matrizInicial = new double[6];
+  //   transfInicial.getMatrix(matrizInicial);
+
+
+  //   //objetofinal
+  //   AffineTransform transfFinal = new AffineTransform();
+  //   transfFinal.setToTranslation(0,0); //posicao final, será um vetor
+  //   transfFinal.concatenate(mudaTamanho(xMed,yMed,1.5,1.5));//faz a mudança da escaĺa
+  //   transfFinal.rotate(Math.PI/4,xMed,yMed); //faz a rotação do objeto
+
+  //   //matriz para a transformação final
+  //   double[] matrizFinal = new double[6];
+  //   transfFinal.getMatrix(matrizFinal);
+
+
+  //   //Shape usado para aplicar a transformação.
+  //   Shape s;
+
+
+  //   //objeto que irá receber todos os passos intermediários da transformação
+  //   AffineTransform transfIntermed;
+
+  //   double passos = 200; //Number of passos as a Double-value in order 
+  //                               //to avoid repeated casting in the loop.
+  //   for (double i=0; i<=passos; i++)
+  //   {
+  //     //calcula a etapa da interpolação
+  //     transfIntermed = new AffineTransform(
+  //                 interpola(matrizInicial,matrizFinal,i/passos));
+
+  //     //transforma a o quadrado para o tipo shape, para poder aplicar as operações nessárias
+  //     s = transfIntermed.createTransformedShape(quad);
+
+  //     //delay para redesenhar
+  //     congela(50);
+
+  //     limpaJanela(g2d);
+
+  //     //redesenha
+  //     g2d.fill(s);
+  //   }
+  // }
 
 
   //calcula a interpolação
