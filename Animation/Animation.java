@@ -4,9 +4,15 @@ import java.awt.*;
 import java.awt.geom.*;
 import java.util.Date; 
 import java.util.ArrayList;
+import Point.Point;
 
-import Point.Point; // eu odeio java...
 
+
+// TODO: Falta implementar as repeticoes (shiftar);
+// TODO: Arrumar a identacao e refatorar o codigo;
+// NOTE: Ta dando pau nas interpolacoes (debuggar);
+// NOTE: O Bresenham aparentemente esta correto, porem aparece virado;
+// COMPILE: javac Animation/Animation.java Main.java
 
 /*	trabalho para a avaliação de computação gráfica
 *	link : https://drive.google.com/drive/u/0/#folders/0B5YsmRIBzCHWT0wwWjFOc0pIdm8
@@ -17,6 +23,8 @@ import Point.Point; // eu odeio java...
 
 
 public class Animation extends Frame {
+//public class Animation {
+
   //Construtor
   public Animation(  int r, int s, int n, int x, int y ) {
 
@@ -31,7 +39,6 @@ public class Animation extends Frame {
     addWindowListener(new MyFinishWindow());
     
   }
-
 
   // acho que essa classe ponto pode dar pau dps. Nao sei se precisa implementar o metodo tostring e 
   //tals pra usar com o arraylist 
@@ -96,6 +103,57 @@ public class Animation extends Frame {
 
   }
 
+private double[] calculateTransformations(Point pi, Point pf, int i) {
+
+
+  double[] matriz = new double[6];
+
+  AffineTransform tranformation = new AffineTransform();
+  tranformation.setToTranslation(pf.get_x(), pf.get_y());
+
+  int turn = i % 2;
+
+  double mx, my;
+  
+  if (turn != 0) {
+    mx = (double)pi.get_x() + 5.0;
+    my = (double)pi.get_y() + 5.0;
+    tranformation.concatenate( mudaTamanho(mx, my, 1.5, 1.5) );
+    tranformation.rotate( Math.toRadians(-45), mx, my );
+  } else {
+    mx = (double)pi.get_x() + 7.5;
+    my = (double)pi.get_y() + 7.5;
+    tranformation.concatenate( mudaTamanho(mx, my, 0.666, 0.666) );
+    tranformation.rotate( Math.toRadians(45), mx, my);
+  }
+
+  tranformation.getMatrix(matriz);
+
+
+  return matriz;
+
+}
+
+
+private void calculateInterpolationPoints(Point pi, Point pf, int jump, int i ) {
+
+    int size = point_list.size();
+
+    pi.set_x(point_list.get( i * jump ).get_x());
+    pi.set_y(point_list.get( i * jump ).get_y());
+
+    if ( (i * jump  + jump) > size ) {
+      pf.set_x(point_list.get(size).get_x());
+      pf.set_y(point_list.get(size).get_y());
+       
+    } else {
+      pf.set_x(point_list.get((i * jump ) + jump ).get_x());
+      pf.set_y(point_list.get((i * jump ) + jump ).get_x()); 
+    }
+}
+
+
+// sobro pontos [note]
   public void debugg() {
 
     int i = 0;
@@ -104,6 +162,36 @@ public class Animation extends Frame {
       System.out.format("(x,y) = (%d, %d) \t %d\n", x.get_x(), x.get_y(), i++ );
     }
 
+
+    int jump = (point_list.size() / segments);
+
+    System.out.format("Jump = %d\n", jump);
+
+
+    int x_jump_inicial = 0;
+    int y_jump_inicial = 0;
+
+    int x_jump_final   = 0;
+    int y_jump_final   = 0;
+
+    for ( int r = 0; r < repetitions; r++ ) {
+
+      for (int j = 0; j < segments; j++) {
+        x_jump_inicial = point_list.get(j * (jump ) ).get_x();  
+        y_jump_inicial = point_list.get(j * (jump ) ).get_y();
+
+        if ( (j * jump  + jump) > point_list.size() ) {
+          x_jump_final = point_list.get(point_list.size()).get_x();
+          y_jump_final = point_list.get(point_list.size()).get_y(); 
+
+        } else {
+            x_jump_final = point_list.get((j * jump ) + jump ).get_x();  
+            y_jump_final = point_list.get((j * jump ) + jump).get_y();  
+        }
+        
+        System.out.format("(x_i = %d , y_i = %d) --> (x_f = %d , y_f = %d)\n", x_jump_inicial, y_jump_inicial, x_jump_final, y_jump_final);
+      }      
+    }
   }
 
 
@@ -115,146 +203,67 @@ public void paint(Graphics g) {
     Graphics2D g2d = (Graphics2D) g;
     //Ativa o antialiasing
     g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);
-
-
-    // ver deposi ...
-    int coordIniX, coordIniY, tamanhoFinal;
-  
-
+ 
+    int coordIniX, coordIniY;
     coordIniX = x_0 - radius;       //coordenada inicial no X
     coordIniY = y_0;                //coordenada inicial do Y
     //cria a elipse de acordo com as coordenadas iniciais e tamanho
-    Rectangle2D.Double quad = new Rectangle2D.Double(coordIniX,coordIniY,10 , 10);
 
-
-    //Ponto médio dos lados do quadrado
-    //é usado para definir o ponto central para a rotação
-    // ver depois
-
-
-    //Cria a rotação inical 0 graus a partir do ponto central.
-    //AffineTransform transfInicial = new AffineTransform();
-    //transfInicial.setToRotation(0,xMed,yMed); //rotação inicial
-
-
-
-    //objetofinal
-    // AffineTransform transfFinal = new AffineTransform();
-    // transfFinal.setToTranslation(0,0); //posicao final, será um vetor
-    // transfFinal.concatenate(mudaTamanho(xMed,yMed,1.5,1.5));//faz a mudança da escaĺa
-    // transfFinal.rotate(Math.PI/4,xMed,yMed); //faz a rotação do objeto
-
-
-
-
-   // double passos = 200; //Number of passos as a Double-value in order 
-                                //to avoid repeated casting in the loop.
-
+    Rectangle2D.Double quad = new Rectangle2D.Double(coordIniX, coordIniY,10 , 10);
 
 // ---------------------------------------------------------------------
+    double xMed = coordIniX + 5.0;
+    double yMed = coordIniY + 5.0;
 
-
-    double xMed = coordIniX + 5;
-    double yMed = coordIniY + 5;
+    Point pi = new Point();
+    Point pf = new Point();
 
     int jump = (point_list.size() / segments);
-
-    System.out.format("Jump = %d\n", jump);
-
 
     //Shape usado para aplicar a transformação.
     Shape s;
 
+    double[] matrizFinal   = new double[6];
+    double[] matrizInicial = new double[6];
 
+    AffineTransform inicialTranformation = new AffineTransform();
+    inicialTranformation.setToRotation(0, xMed, yMed);
+
+    inicialTranformation.getMatrix(matrizInicial);
+
+    // --- PARAMOS AQUI TENTANDO RESOLVER OS PROBLEMAS DA INTERPOLACAO ---- 
     //objeto que irá receber todos os passos intermediários da transformação
     AffineTransform transfIntermed;
 
+    /*
     for ( int r = 0; r < repetitions; r++ ) {
 
       for (int j = 0; j < segments; j++) {
 
+        calculateInterpolationPoints(pi, pf, jump, j);
+        matrizFinal = calculateTransformations(pi, pf, j);
 
-      int x_jump = point_list.get(j * jump).get_x();  
-      int y_jump = point_list.get(j * jump).get_y();  
-
-
-      System.out.format("(x + jump = %d , y + jump  = %d)\n", x_jump, y_jump);
-
-      AffineTransform rotation  = new AffineTransform(); // realmente preciso iniciar aqui?
-      AffineTransform translate = new AffineTransform();
-      translate.setToTranslation(x_jump , y_jump);
-
-      if ( (j % 2) == 0 )  {
-        rotation.setToRotation( Math.toRadians(45), xMed, yMed );
-        translate.concatenate( mudaTamanho(x_jump, y_jump, 1.5, 1.5) );
-      } else {
-        translate.setToRotation(Math.toRadians(-45), xMed, yMed );
-        translate.concatenate( mudaTamanho(x_jump, y_jump, 0.6666, 0.6666) );
-      } 
-
-
-       //Cria e o objeto inicial
-      double[] matrizInicial = new double[6];
-      rotation.getMatrix(matrizInicial);
-
-      //matriz para a transformação final
-      double[] matrizFinal = new double[6];
-      translate.getMatrix(matrizFinal);
-
-      for (double step = 0; step < 10; step++ ) {
-         //calcula a etapa da interpolação
-        transfIntermed = new AffineTransform( interpola(matrizInicial, matrizFinal , step/200) );
-
-        //transforma a o quadrado para o tipo shape, para poder aplicar as operações nessárias
-        s = transfIntermed.createTransformedShape(quad);
-
-        //delay para redesenhar
-        congela(50);
-
-        limpaJanela(g2d);
-
-        //redesenha
-        g2d.fill(s);
-      }
-
-      // talvez seja dentro do if para a atual transf;  
-      xMed = x_jump + 5;  
-      yMed = y_jump + 5;  
-
-      //point_list.get(j * jump).get_x(), point_list.get(j * jump).get_x()  
-
-      }
         
+        for (double step = 0; step < 200; step++ ) {
+           //calcula a etapa da interpolação
+             
+          transfIntermed = new AffineTransform( interpola(matrizInicial, matrizFinal , step/200) );
+          s = transfIntermed.createTransformedShape(quad);
+          congela(50);
+          limpaJanela(g2d);
+          g2d.fill(s);
+        }
+
+        matrizInicial = matrizFinal; // sera que vai funcionar ?
+      }           
     }
 
+    */
 
-
-// ---------------------------------------------------------------------
-
-    // for (double i=0; i<=passos; i++)
-    // {
-    //   //calcula a etapa da interpolação
-    //   transfIntermed = new AffineTransform(
-    //               interpola(matrizInicial,matrizFinal,i/passos));
-
-    //   //transforma a o quadrado para o tipo shape, para poder aplicar as operações nessárias
-    //   s = transfIntermed.createTransformedShape(quad);
-
-    //   //delay para redesenhar
-    //   congela(50);
-
-    //   limpaJanela(g2d);
-
-    //   //redesenha
-    //   g2d.fill(s);
-    // }
-  }
-
-
+}
   //calcula a interpolação
   // alfa sempre será estara no intervalo de [0,1]
-  public double[] interpola(double[] inicial,double[] terminal, double alfa)
-  {
+  public double[] interpola(double[] inicial,double[] terminal, double alfa) {
     double[] intermed = new double[inicial.length]; //matriz que vai conter os valores váriaveis da interpolação
 
     for (int i=0; i<intermed.length; i++)
@@ -264,8 +273,6 @@ public void paint(Graphics g) {
 
     return(intermed);
   }
-
-
   //método que limpa a janela
   public void limpaJanela(Graphics2D g)
   {
@@ -295,7 +302,6 @@ public void paint(Graphics g) {
     long finish = (new Date()).getTime() + t;
     while( (new Date()).getTime() < finish ){}
   }
-
 
   private int radius;     
   private int segments;   

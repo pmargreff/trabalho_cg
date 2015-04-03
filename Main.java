@@ -19,7 +19,7 @@ public class Main {
 
 			//scene.debugg();
 	    	scene.setTitle("CG Trabalho I - Bruno e Pablo");
-	    	scene.setSize(100 + radius, (radius * 2 * repetitions) + 100);
+	    	scene.setSize( 600, 300);
 	   		scene.setVisible(true);
 
  
