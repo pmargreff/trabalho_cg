@@ -26,7 +26,7 @@ public class Animation extends Frame {
 //public class Animation {
 
   //Construtor
-  public Animation(  int r, int s, int n, int x, int y ) {
+public Animation(  int r, int s, int n, int x, int y ) {
 
     this.radius      = r;
     this.segments    = s;
@@ -105,7 +105,6 @@ public class Animation extends Frame {
 
 private double[] calculateTransformations(Point pi, Point pf, int i) {
 
-
   double[] matriz = new double[6];
 
   AffineTransform tranformation = new AffineTransform();
@@ -119,12 +118,12 @@ private double[] calculateTransformations(Point pi, Point pf, int i) {
     mx = (double)pi.get_x() + 5.0;
     my = (double)pi.get_y() + 5.0;
     tranformation.concatenate( mudaTamanho(mx, my, 1.5, 1.5) );
-    tranformation.rotate( Math.toRadians(-45), mx, my );
+    //tranformation.rotate( Math.toRadians(45), mx, my );
   } else {
     mx = (double)pi.get_x() + 7.5;
     my = (double)pi.get_y() + 7.5;
     tranformation.concatenate( mudaTamanho(mx, my, 0.666, 0.666) );
-    tranformation.rotate( Math.toRadians(45), mx, my);
+    //tranformation.rotate( Math.toRadians(45), mx, my);
   }
 
   tranformation.getMatrix(matriz);
@@ -203,10 +202,16 @@ public void paint(Graphics g) {
     Graphics2D g2d = (Graphics2D) g;
     //Ativa o antialiasing
     g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);
- 
+  
+    Point pi = new Point();
+    Point pf = new Point();
+
+    int jump = (point_list.size() / segments);
+
+    // depois
     int coordIniX, coordIniY;
-    coordIniX = x_0 - radius;       //coordenada inicial no X
-    coordIniY = y_0;                //coordenada inicial do Y
+    coordIniX = point_list.get(0).get_x();       //coordenada inicial no X
+    coordIniY = point_list.get(0).get_y();                //coordenada inicial do Y
     //cria a elipse de acordo com as coordenadas iniciais e tamanho
 
     Rectangle2D.Double quad = new Rectangle2D.Double(coordIniX, coordIniY,10 , 10);
@@ -215,42 +220,56 @@ public void paint(Graphics g) {
     double xMed = coordIniX + 5.0;
     double yMed = coordIniY + 5.0;
 
-    Point pi = new Point();
-    Point pf = new Point();
-
-    int jump = (point_list.size() / segments);
-
     //Shape usado para aplicar a transformação.
     Shape s;
 
     double[] matrizFinal   = new double[6];
     double[] matrizInicial = new double[6];
 
+    AffineTransform normalizer = new AffineTransform();
+    normalizer.setToScale(1, -1);
+
+    AffineTransform translate = new AffineTransform();
+    translate.setToTranslation(0, 300);
+    normalizer.preConcatenate(translate);
+
+    g2d.transform(normalizer);
+
+
     AffineTransform inicialTranformation = new AffineTransform();
     inicialTranformation.setToRotation(0, xMed, yMed);
 
     inicialTranformation.getMatrix(matrizInicial);
 
+
+    // Debugg ...
+    // for (int i = 0; i < point_list.size(); i++ ) {
+    //     Point tmp = point_list.get(i);
+
+    //     Rectangle2D.Double q = new Rectangle2D.Double(tmp.get_x() + x_0, tmp.get_y() + y_0, 20, 20);
+    //     g2d.fill(q);
+    // }
+
+
     // --- PARAMOS AQUI TENTANDO RESOLVER OS PROBLEMAS DA INTERPOLACAO ---- 
     //objeto que irá receber todos os passos intermediários da transformação
     AffineTransform transfIntermed;
-
-    /*
+    
     for ( int r = 0; r < repetitions; r++ ) {
 
-      for (int j = 0; j < segments; j++) {
+      for (int j = 1; j < segments; j++) {
 
         calculateInterpolationPoints(pi, pf, jump, j);
         matrizFinal = calculateTransformations(pi, pf, j);
 
         
-        for (double step = 0; step < 200; step++ ) {
+        for (double step = 0; step < 100; step++ ) {
            //calcula a etapa da interpolação
              
-          transfIntermed = new AffineTransform( interpola(matrizInicial, matrizFinal , step/200) );
+          transfIntermed = new AffineTransform( interpola(matrizInicial, matrizFinal , step/100) );
           s = transfIntermed.createTransformedShape(quad);
           congela(50);
-          limpaJanela(g2d);
+          //limpaJanela(g2d);
           g2d.fill(s);
         }
 
@@ -258,7 +277,6 @@ public void paint(Graphics g) {
       }           
     }
 
-    */
 
 }
   //calcula a interpolação
@@ -289,9 +307,9 @@ public void paint(Graphics g) {
   {
     AffineTransform mt = new AffineTransform();
 
-    mt.translate(x,y);
+    mt.translate(0,300);
     mt.scale(novaEscalaX,novaEscalaY);
-    mt.translate(-x,-y); //perguntar para Marilton por que a translação está negativada !!!!
+    mt.translate(x,y); //perguntar para Marilton por que a translação está negativada !!!!
 
     return(mt);
   }
