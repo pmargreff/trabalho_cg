@@ -17,10 +17,11 @@ public class Main {
 			if ( repetitions < 1 ) repetitions = 1;
 			if ( radius < 2 ) radius = 2;
 
-			Animation scene = new Animation(radius, segments, repetitions, x_0, y_0);
-			int width = radius * 2 * repetitions + 100 + x_0;
+			int width  = radius * 2 * repetitions + 100 + x_0;
 			int height = radius + y_0 + 100;
-			//scene.debugg();
+
+			Animation scene = new Animation(radius, segments, repetitions, x_0, y_0);
+
 	    	scene.setTitle("CG Trabalho I - Bruno e Pablo");
 	    	scene.setSize(width, height);
 	   		scene.setVisible(true);
