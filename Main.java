@@ -29,7 +29,7 @@ public class Main {
  
 		} else {
 
-			System.out.println("Erro com parametros"); // todo: arrumar msg
+			System.out.println("Parametros invalidos.\nDigite: java Main < raio > < segmentos > < repeticoes > < x_0 >  < y_0 >\n");
 		}
 
   }
