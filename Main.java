@@ -14,12 +14,15 @@ public class Main {
 
 
 			if ( segments < 2 ) segments = 2;
+			if ( repetitions < 1 ) repetitions = 1;
+			if ( radius < 2 ) radius = 2;
 
-			Animation scene = new Animation( radius, segments, repetitions, x_0, y_0 );
-
+			Animation scene = new Animation(radius, segments, repetitions, x_0, y_0);
+			int width = radius * 2 * repetitions + 100 + x_0;
+			int height = radius + y_0 + 100;
 			//scene.debugg();
 	    	scene.setTitle("CG Trabalho I - Bruno e Pablo");
-	    	scene.setSize( 600, 300);
+	    	scene.setSize(width, height);
 	   		scene.setVisible(true);
 
  

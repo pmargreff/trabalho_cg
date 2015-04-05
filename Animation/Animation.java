@@ -23,7 +23,6 @@ import java.util.Collections;
 
 
 public class Animation extends Frame {
-//public class Animation {
 
   //Construtor
 public Animation(  int r, int s, int n, int x, int y ) {
@@ -104,37 +103,60 @@ public Animation(  int r, int s, int n, int x, int y ) {
   }
 
 //private double[] calculateTransformations(Point pf, int i, AffineTransform t , AffineTransform ro, AffineTransform sc) {
-private void calculateTransformations(Point pf, int i, AffineTransform t , AffineTransform ro, AffineTransform sc) {
+private void calculateTransformations(Point pi,Point pf, int i, AffineTransform t , AffineTransform ro, AffineTransform sc) {
 
   //double[] matriz = new double[6];
 
   AffineTransform tr = new AffineTransform();
+  
   tr.setToTranslation(pf.get_x(), pf.get_y());      
 
   if ((i % 2) == 0) {
     
-    double rx = pf.get_x() * Math.cos(-45) - pf.get_y() * Math.sin(-45); 
-    double ry = pf.get_x() * Math.sin(-45) + pf.get_y() * Math.cos(-45); 
+    // double rx = pf.get_x() * Math.cos(-45) - pf.get_y() * Math.sin(-45); 
+    // double ry = pf.get_x() * Math.sin(-45) + pf.get_y() * Math.cos(-45); 
 
-    AffineTransform r = new AffineTransform();
-    r.rotate(rx, ry);
-
-    sc.scale(1.5, 1.5);
+    // AffineTransform r = new AffineTransform();
+    // r.rotate(rx, ry);
+    AffineTransform origem = new AffineTransform();
+    origem.setToTranslation(x_0,y_0);
+    
+    AffineTransform at = AffineTransform.getRotateInstance(-Math.PI / 4,pf.get_x() ,pf.get_y() );
+    
+      AffineTransform scaling = new AffineTransform();
+      // scaling.setToScale(1.5,1.5);
+    //sc.scale(1.5, 1.5);
     //ro.rotate(Math.toRadians(45));
+    t.concatenate(origem);
+    t.concatenate(at);
     t.concatenate(tr);
-    //t.concatenate(sc);
-    t.concatenate(r);
+    
+    t.scale(1.5,1.5);
+    //t.concatenate(mudaTamanho(pf.get_x(),pf.get_x(),1.5,1.5));
+
+    
   } else {
 
-    double rx = pf.get_x() * Math.cos(315) - pf.get_y() * Math.sin(315); 
-    double ry = pf.get_x() * Math.sin(315) + pf.get_y() * Math.cos(315); 
-
-    sc.scale(10f/15f, 10f/15f);
+    //AffineTransform at = AffineTransform.getRotateInstance(0,pf.get_x() + 5,pf.get_y() + 5);
+    //double rx = pf.get_x() * Math.cos(315) - pf.get_y() * Math.sin(315); 
+    //double ry = pf.get_x() * Math.sin(315) + pf.get_y() * Math.cos(315); 
+    AffineTransform scaling = new AffineTransform();
+    scaling.setToScale(10.0/15.0,10.0/15.0);
+    
+    AffineTransform origem = new AffineTransform();
+    origem.setToTranslation(x_0,y_0);
+    
+    //sc.scale(10f/15f, 10f/15f);
     //ro.rotate(Math.toRadians(315));
-    t.concatenate(tr);
     //t.concatenate(sc);
-    //t.concatenate(ro);
 
+    AffineTransform at = AffineTransform.getRotateInstance(0,pf.get_x() ,pf.get_y() );
+    t.concatenate(origem);
+    t.concatenate(at);
+    t.concatenate(tr);
+
+    //t.scale(10.0/15.0,10.0/15.0);
+    //t.concatenate(mudaTamanho(pf.get_x(),pf.get_x(),10.0/15.0,10.0/15.0));        
   }
 
   //t.getMatrix(matriz);
@@ -143,16 +165,17 @@ private void calculateTransformations(Point pf, int i, AffineTransform t , Affin
 }
 
 
-private void calculateInterpolationPoints(Point pf, int jump, int i ) {
+private void calculateInterpolationPoints(Point pf, int jump, int i ,int r) {
+
 
     int size = point_list.size();
 
     if ( (i * jump  + jump) > size ) {
-      pf.set_x(point_list.get(size).get_x());
+      pf.set_x(point_list.get(size).get_x() + r);
       pf.set_y(point_list.get(size).get_y());
        
     } else {
-      pf.set_x(point_list.get((i * jump ) + jump ).get_x());
+      pf.set_x(point_list.get((i * jump ) + jump ).get_x() + r);
       pf.set_y(point_list.get((i * jump ) + jump ).get_y()); 
     }
 
@@ -220,14 +243,15 @@ public void paint(Graphics g) {
     pi.set_x(point_list.get(0).get_x());
     pi.set_y(point_list.get(0).get_y());
 
-    Rectangle2D.Double quad = new Rectangle2D.Double(pi.get_x(), pi.get_y(), 10 , 10);
+    Rectangle2D.Double quad = new Rectangle2D.Double(0, 0, 10 , 10);
 
 
     AffineTransform normalizer = new AffineTransform();
     normalizer.setToScale(1, -1);
 
+
     AffineTransform translate = new AffineTransform();
-    translate.setToTranslation(0, 300);
+    translate.setToTranslation(0, y_0 + radius + 100);
     normalizer.preConcatenate(translate);
 
     g2d.transform(normalizer);
@@ -241,8 +265,6 @@ public void paint(Graphics g) {
 
 
     AffineTransform inicialTranformation = new AffineTransform();
-    inicialTranformation.setToTranslation(pi.get_x(), pi.get_y());
-    inicialTranformation.getMatrix(matrizInicial);
 
     //objeto que irá receber todos os passos intermediários da transformação
 
@@ -253,23 +275,25 @@ public void paint(Graphics g) {
     AffineTransform  transfIntermed; 
     
     for ( int r = 0; r < repetitions; r++ ) {
+      int shift = r * radius * 2;
+    inicialTranformation.setToTranslation(x_0 + pi.get_x() + shift, y_0 + pi.get_y());
+    inicialTranformation.getMatrix(matrizInicial);
 
-      for (int j = 0; j < segments; j++) {
+      for (int j = 0; j < segments; j++) { 
 
-        calculateInterpolationPoints(pf, jump, j);
-        calculateTransformations( pf, j, tracking, rotation, scaling);
+
+        calculateInterpolationPoints(pf, jump, j, shift);
+        calculateTransformations(pi,  pf, j, tracking, rotation, scaling);
        
         double [] matrizFinal = new double[6];
         tracking.getMatrix(matrizFinal);
 
         for (double step = 0; step < 10; step++ ) {
-           //calcula a etapa da interpolação
-             
           transfIntermed = new AffineTransform( interpola( matrizInicial, matrizFinal , step/10) );
           s = transfIntermed.createTransformedShape(quad);
-          congela(100);
-          //limpaJanela(g2d);
-          g2d.fill(s);
+          congela(50);
+          limpaJanela(g2d);
+          g2d.draw(s);
         }
 
         tracking.setToIdentity();
@@ -297,21 +321,21 @@ public void paint(Graphics g) {
   public void limpaJanela(Graphics2D g)
   {
     g.setPaint(Color.white); //define o pincel como branco
-    g.fill(new Rectangle(0,0,600,300)); //cria um retangulo preenchido da primeira cor
+    g.fill(new Rectangle(0,0,radius * 2 * repetitions + 100 + x_0,radius + y_0 + 100)); //cria um retangulo preenchido da primeira cor
     g.setPaint(Color.black); //faz o pincel ser preto novamente
   }
 
 
   //recebe como parametros as dimenções do objeto original e as novas 
   //escalas em x e y que cada um deve receber
-  public AffineTransform mudaTamanho(double x, double y,
+  public AffineTransform mudaTamanho(int x, int y,
                                              double novaEscalaX, double novaEscalaY)
   {
     AffineTransform mt = new AffineTransform();
 
-    mt.translate(0,300);
+    //mt.translate(x_0,y_0);
     mt.scale(novaEscalaX,novaEscalaY);
-    mt.translate(x,y); //perguntar para Marilton por que a translação está negativada !!!!
+    //mt.translate(x,y); //perguntar para Marilton por que a translação está negativada !!!!
 
     return(mt);
   }
