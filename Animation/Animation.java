@@ -5,7 +5,7 @@ import java.awt.geom.*;
 import java.util.Date; 
 import java.util.ArrayList;
 import Point.Point;
-
+import java.util.Collections;
 
 
 // TODO: Falta implementar as repeticoes (shiftar);
@@ -103,43 +103,49 @@ public Animation(  int r, int s, int n, int x, int y ) {
 
   }
 
-private double[] calculateTransformations(Point pi, Point pf, int i) {
+//private double[] calculateTransformations(Point pf, int i, AffineTransform t , AffineTransform ro, AffineTransform sc) {
+private void calculateTransformations(Point pf, int i, AffineTransform t , AffineTransform ro, AffineTransform sc) {
 
-  double[] matriz = new double[6];
+  //double[] matriz = new double[6];
 
-  AffineTransform tranformation = new AffineTransform();
-  tranformation.setToTranslation(pf.get_x(), pf.get_y());
+  AffineTransform tr = new AffineTransform();
+  tr.setToTranslation(pf.get_x(), pf.get_y());      
 
-  int turn = i % 2;
+  if ((i % 2) == 0) {
+    
+    double rx = pf.get_x() * Math.cos(-45) - pf.get_y() * Math.sin(-45); 
+    double ry = pf.get_x() * Math.sin(-45) + pf.get_y() * Math.cos(-45); 
 
-  double mx, my;
-  
-  if (turn != 0) {
-    mx = (double)pi.get_x() + 5.0;
-    my = (double)pi.get_y() + 5.0;
-    tranformation.concatenate( mudaTamanho(mx, my, 1.5, 1.5) );
-    //tranformation.rotate( Math.toRadians(45), mx, my );
+    AffineTransform r = new AffineTransform();
+    r.rotate(rx, ry);
+
+    sc.scale(1.5, 1.5);
+    //ro.rotate(Math.toRadians(45));
+    t.concatenate(tr);
+    //t.concatenate(sc);
+    t.concatenate(r);
   } else {
-    mx = (double)pi.get_x() + 7.5;
-    my = (double)pi.get_y() + 7.5;
-    tranformation.concatenate( mudaTamanho(mx, my, 0.666, 0.666) );
-    //tranformation.rotate( Math.toRadians(45), mx, my);
+
+    double rx = pf.get_x() * Math.cos(315) - pf.get_y() * Math.sin(315); 
+    double ry = pf.get_x() * Math.sin(315) + pf.get_y() * Math.cos(315); 
+
+    sc.scale(10f/15f, 10f/15f);
+    //ro.rotate(Math.toRadians(315));
+    t.concatenate(tr);
+    //t.concatenate(sc);
+    //t.concatenate(ro);
+
   }
 
-  tranformation.getMatrix(matriz);
-
-
-  return matriz;
-
+  //t.getMatrix(matriz);
+  
+  //return matriz;
 }
 
 
-private void calculateInterpolationPoints(Point pi, Point pf, int jump, int i ) {
+private void calculateInterpolationPoints(Point pf, int jump, int i ) {
 
     int size = point_list.size();
-
-    pi.set_x(point_list.get( i * jump ).get_x());
-    pi.set_y(point_list.get( i * jump ).get_y());
 
     if ( (i * jump  + jump) > size ) {
       pf.set_x(point_list.get(size).get_x());
@@ -147,8 +153,10 @@ private void calculateInterpolationPoints(Point pi, Point pf, int jump, int i ) 
        
     } else {
       pf.set_x(point_list.get((i * jump ) + jump ).get_x());
-      pf.set_y(point_list.get((i * jump ) + jump ).get_x()); 
+      pf.set_y(point_list.get((i * jump ) + jump ).get_y()); 
     }
+
+    System.out.format("(x %d ,y %d)\t%d\n", pf.get_x(), pf.get_y(), i);
 }
 
 
@@ -208,23 +216,12 @@ public void paint(Graphics g) {
 
     int jump = (point_list.size() / segments);
 
-    // depois
-    int coordIniX, coordIniY;
-    coordIniX = point_list.get(0).get_x();       //coordenada inicial no X
-    coordIniY = point_list.get(0).get_y();                //coordenada inicial do Y
-    //cria a elipse de acordo com as coordenadas iniciais e tamanho
 
-    Rectangle2D.Double quad = new Rectangle2D.Double(coordIniX, coordIniY,10 , 10);
+    pi.set_x(point_list.get(0).get_x());
+    pi.set_y(point_list.get(0).get_y());
 
-// ---------------------------------------------------------------------
-    double xMed = coordIniX + 5.0;
-    double yMed = coordIniY + 5.0;
+    Rectangle2D.Double quad = new Rectangle2D.Double(pi.get_x(), pi.get_y(), 10 , 10);
 
-    //Shape usado para aplicar a transformação.
-    Shape s;
-
-    double[] matrizFinal   = new double[6];
-    double[] matrizInicial = new double[6];
 
     AffineTransform normalizer = new AffineTransform();
     normalizer.setToScale(1, -1);
@@ -236,44 +233,49 @@ public void paint(Graphics g) {
     g2d.transform(normalizer);
 
 
-    AffineTransform inicialTranformation = new AffineTransform();
-    inicialTranformation.setToRotation(0, xMed, yMed);
+    //Shape usado para aplicar a transformação.
+    Shape s;
 
+    //double[] matrizFinal   = new double[6];
+    double[] matrizInicial = new double[6];
+
+
+    AffineTransform inicialTranformation = new AffineTransform();
+    inicialTranformation.setToTranslation(pi.get_x(), pi.get_y());
     inicialTranformation.getMatrix(matrizInicial);
 
-
-    // Debugg ...
-    // for (int i = 0; i < point_list.size(); i++ ) {
-    //     Point tmp = point_list.get(i);
-
-    //     Rectangle2D.Double q = new Rectangle2D.Double(tmp.get_x() + x_0, tmp.get_y() + y_0, 20, 20);
-    //     g2d.fill(q);
-    // }
-
-
-    // --- PARAMOS AQUI TENTANDO RESOLVER OS PROBLEMAS DA INTERPOLACAO ---- 
     //objeto que irá receber todos os passos intermediários da transformação
-    AffineTransform transfIntermed;
+
+    AffineTransform tracking = new AffineTransform();
+    AffineTransform rotation = new AffineTransform();
+    AffineTransform scaling  = new AffineTransform(); 
+
+    AffineTransform  transfIntermed; 
     
     for ( int r = 0; r < repetitions; r++ ) {
 
-      for (int j = 1; j < segments; j++) {
+      for (int j = 0; j < segments; j++) {
 
-        calculateInterpolationPoints(pi, pf, jump, j);
-        matrizFinal = calculateTransformations(pi, pf, j);
+        calculateInterpolationPoints(pf, jump, j);
+        calculateTransformations( pf, j, tracking, rotation, scaling);
+       
+        double [] matrizFinal = new double[6];
+        tracking.getMatrix(matrizFinal);
 
-        
-        for (double step = 0; step < 100; step++ ) {
+        for (double step = 0; step < 10; step++ ) {
            //calcula a etapa da interpolação
              
-          transfIntermed = new AffineTransform( interpola(matrizInicial, matrizFinal , step/100) );
+          transfIntermed = new AffineTransform( interpola( matrizInicial, matrizFinal , step/10) );
           s = transfIntermed.createTransformedShape(quad);
-          congela(50);
+          congela(100);
           //limpaJanela(g2d);
           g2d.fill(s);
         }
 
-        matrizInicial = matrizFinal; // sera que vai funcionar ?
+        tracking.setToIdentity();
+
+        for (int i = 0; i < 6; i++ ) matrizInicial[i] = matrizFinal[i];
+        
       }           
     }
 
