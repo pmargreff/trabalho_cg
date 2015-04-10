@@ -83,7 +83,7 @@ private ArrayList<Point> calculateBrasenham() {
 
   }
 
-private void calculateTransformations(Point pi,Point pf, Flag turn, AffineTransform t) {
+private void calculateTransformations(Point pf, Flag turn, AffineTransform t) {
 
   AffineTransform tr = new AffineTransform();
   
@@ -118,13 +118,12 @@ private void calculateTransformations(Point pi,Point pf, Flag turn, AffineTransf
     t.concatenate(tr);
     
     turn.set_value(true);
-
   }
 }
 
-private void calculateInterpolationPoints(Point pf, int jump, int i ,int r) {
+private void calculateInterpolationPoints(Point pf, int jump, int i ,int r ) {
 
-    int size = point_list.size();
+    int size = point_list.size() - 1;
 
     if ( (i * jump  + jump) > size ) {
       pf.set_x(point_list.get(size).get_x() + r);
@@ -134,6 +133,9 @@ private void calculateInterpolationPoints(Point pf, int jump, int i ,int r) {
       pf.set_x(point_list.get((i * jump ) + jump ).get_x() + r);
       pf.set_y(point_list.get((i * jump ) + jump ).get_y()); 
     }
+
+    System.out.format("(%d, %d)\t%d\n",pf.get_x(), pf.get_y(), i );
+
 }
 
 public void paint(Graphics g) {
@@ -145,7 +147,21 @@ public void paint(Graphics g) {
     Point pi = new Point();
     Point pf = new Point();
 
-    int jump = (point_list.size() / segments);
+    double size = (double)point_list.size();
+
+
+    double jump_delta = size / segments;
+
+
+    double remainder = size % segments;
+    double jump_alfa = jump_delta / remainder;
+
+    int jump = (int) (jump_alfa + jump_delta);
+
+    //segments = (int) Math.ceil( size / (jump_alfa + jump_delta));
+
+
+    System.out.format("points %d seg: %d  jump: %d  the_jump: %f\n", point_list.size(), segments, jump, jump_alfa + jump_delta);
 
     pi.set_x(point_list.get(0).get_x());
     pi.set_y(point_list.get(0).get_y());
@@ -187,7 +203,8 @@ public void paint(Graphics g) {
       for (int j = 0; j < segments; j++) {
 
         calculateInterpolationPoints(pf, jump, j, shift);
-        calculateTransformations(pi, pf, turn, tracking);
+
+        calculateTransformations( pf, turn, tracking);
        
         tracking.getMatrix(matrizFinal);
 
@@ -200,16 +217,19 @@ public void paint(Graphics g) {
           
           limpaJanela(g2d, aux);
           g2d.setPaint(Color.black);          
-          g2d.fill(s);
+          g2d.draw(s);
           congela(10);
           aux = s;
         }
-
+        
         tracking.setToIdentity();
 
         for (int i = 0; i < 6; i++ ) matrizInicial[i] = matrizFinal[i];
         
-      }           
+      }
+   
+      System.out.format("Repts: %d\n", repetitions); 
+           
     }
 
 
