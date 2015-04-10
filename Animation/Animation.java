@@ -83,7 +83,7 @@ private ArrayList<Point> calculateBrasenham() {
 
   }
 
-private void calculateTransformations(Point pi,Point pf, Flag turn, AffineTransform t) {
+private void calculateTransformations(Point pf, Flag turn, AffineTransform t) {
 
   AffineTransform tr = new AffineTransform();
   
@@ -118,13 +118,12 @@ private void calculateTransformations(Point pi,Point pf, Flag turn, AffineTransf
     t.concatenate(tr);
     
     turn.set_value(true);
-
   }
 }
 
-private void calculateInterpolationPoints(Point pf, int jump, int i ,int r) {
+private void calculateInterpolationPoints(Point pf, int jump, int i ,int r ) {
 
-    int size = point_list.size();
+    int size = point_list.size() - 1;
 
     if ( (i * jump  + jump) > size ) {
       pf.set_x(point_list.get(size).get_x() + r);
@@ -145,7 +144,16 @@ public void paint(Graphics g) {
     Point pi = new Point();
     Point pf = new Point();
 
-    int jump = (point_list.size() / segments);
+    double size = (double)point_list.size();
+
+    double jump_delta = size / segments;
+
+    double remainder = size % segments;
+    double jump_alfa = (int)(remainder/jump_delta);
+
+    int jump = (int) jump_delta;
+
+    segments = segments + (int)jump_alfa;
 
     pi.set_x(point_list.get(0).get_x());
     pi.set_y(point_list.get(0).get_y());
@@ -177,8 +185,8 @@ public void paint(Graphics g) {
 
     Flag turn = new Flag(true);
 
-     g2d.setPaint(Color.white);
-     g2d.fill(new Rectangle(0,0,radius * 2 * repetitions + 100 + x_0,radius + y_0 + 100));
+    g2d.setPaint(Color.white);
+    g2d.fill(new Rectangle(0,0,radius * 2 * repetitions + 100 + x_0,radius + y_0 + 100));
 
     for ( int r = 0; r < repetitions; r++ ) {
 
@@ -187,7 +195,8 @@ public void paint(Graphics g) {
       for (int j = 0; j < segments; j++) {
 
         calculateInterpolationPoints(pf, jump, j, shift);
-        calculateTransformations(pi, pf, turn, tracking);
+
+        calculateTransformations( pf, turn, tracking);
        
         tracking.getMatrix(matrizFinal);
 
@@ -200,16 +209,16 @@ public void paint(Graphics g) {
           
           limpaJanela(g2d, aux);
           g2d.setPaint(Color.black);          
-          g2d.fill(s);
+          g2d.draw(s);
           congela(10);
           aux = s;
         }
-
+        
         tracking.setToIdentity();
 
-        for (int i = 0; i < 6; i++ ) matrizInicial[i] = matrizFinal[i];
-        
-      }           
+        for (int i = 0; i < 6; i++ ) matrizInicial[i] = matrizFinal[i];        
+      }
+           
     }
 
 
