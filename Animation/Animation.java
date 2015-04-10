@@ -83,13 +83,13 @@ private ArrayList<Point> calculateBrasenham() {
 
   }
 
-private void calculateTransformations(Point pi,Point pf, int i, AffineTransform t) {
+private void calculateTransformations(Point pi,Point pf, Flag turn, AffineTransform t) {
 
   AffineTransform tr = new AffineTransform();
   
   tr.setToTranslation(pf.get_x(), pf.get_y());      
 
-  if ((i % 2) == 0) {
+  if ( turn.get_value() == true ) {
 
     AffineTransform origem = new AffineTransform();
     origem.setToTranslation(x_0,y_0);
@@ -100,8 +100,10 @@ private void calculateTransformations(Point pi,Point pf, int i, AffineTransform 
       t.concatenate(origem);
       t.concatenate(at);
       t.concatenate(tr);
-      t.scale(1.5,1.5);  
-    
+      t.scale(1.5,1.5);
+
+      turn.set_value(false); 
+   
   } else {
 
     AffineTransform scaling = new AffineTransform();
@@ -114,6 +116,8 @@ private void calculateTransformations(Point pi,Point pf, int i, AffineTransform 
     t.concatenate(origem);
     t.concatenate(at);
     t.concatenate(tr);
+    
+    turn.set_value(true);
 
   }
 }
@@ -136,7 +140,7 @@ public void paint(Graphics g) {
 
     Graphics2D g2d = (Graphics2D) g;
 
-    g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);
+    g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
   
     Point pi = new Point();
     Point pf = new Point();
@@ -158,33 +162,47 @@ public void paint(Graphics g) {
     g2d.transform(normalizer);
 
     Shape s;
+    
     double[] matrizInicial = new double[6];
+    double[] matrizFinal   = new double[6];
 
     AffineTransform inicialTranformation = new AffineTransform();
 
     AffineTransform tracking = new AffineTransform();
 
-    AffineTransform  transfIntermed; 
-    
+    AffineTransform  transfIntermed;
+
+    inicialTranformation.setToTranslation(x_0 + pi.get_x(), y_0 + pi.get_y());
+    inicialTranformation.getMatrix(matrizInicial); 
+
+    Flag turn = new Flag(true);
+
+     g2d.setPaint(Color.white);
+     g2d.fill(new Rectangle(0,0,radius * 2 * repetitions + 100 + x_0,radius + y_0 + 100));
+
     for ( int r = 0; r < repetitions; r++ ) {
+
       int shift = r * radius * 2;
-      inicialTranformation.setToTranslation(x_0 + pi.get_x() + shift, y_0 + pi.get_y());
-      inicialTranformation.getMatrix(matrizInicial);
 
       for (int j = 0; j < segments; j++) {
 
         calculateInterpolationPoints(pf, jump, j, shift);
-        calculateTransformations(pi, pf, j, tracking);
+        calculateTransformations(pi, pf, turn, tracking);
        
-        double [] matrizFinal = new double[6];
         tracking.getMatrix(matrizFinal);
 
+        Shape aux = null;
+
         for (double step = 0; step < 35; step++ ) {
-          transfIntermed = new AffineTransform( interpola( matrizInicial, matrizFinal , step/35) );
+
+          transfIntermed = new AffineTransform( interpola( matrizInicial, matrizFinal, step/35) );
           s = transfIntermed.createTransformedShape(quad);
-          congela(100);
-          limpaJanela(g2d);
+          
+          limpaJanela(g2d, aux);
+          g2d.setPaint(Color.black);          
           g2d.fill(s);
+          congela(10);
+          aux = s;
         }
 
         tracking.setToIdentity();
@@ -209,11 +227,18 @@ public double[] interpola(double[] inicial,double[] terminal, double alfa) {
 }
 
 //método que limpa a janela
-public void limpaJanela(Graphics2D g)
+public void limpaJanela(Graphics2D g, Shape a)
  {
-   g.setPaint(Color.white);
-   g.fill(new Rectangle(0,0,radius * 2 * repetitions + 100 + x_0,radius + y_0 + 100));
-   g.setPaint(Color.black);
+    if (a != null) {
+
+      Rectangle2D.Double tmp = (Rectangle2D.Double)a.getBounds2D();
+
+     double x = tmp.getX();
+     double y = tmp.getY();
+     g.setPaint(Color.white);
+     g.fill(new Rectangle2D.Double(x - 5, y - 5, 30, 30));
+
+    }
 }
 
   //recebe o tempo em milissegundos
