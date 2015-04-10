@@ -12,6 +12,8 @@ public class Main {
 			int x_center	= Integer.parseInt(argv[3]);
 			int y_center	= Integer.parseInt(argv[4]);
 
+			x_center = x_center - radius;
+
 
 			if ( segments < 2 ) segments = 2;
 			if ( repetitions < 1 ) repetitions = 1;

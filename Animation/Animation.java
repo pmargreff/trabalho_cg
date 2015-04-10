@@ -179,7 +179,6 @@ public void paint(Graphics g) {
 
      g2d.setPaint(Color.white);
      g2d.fill(new Rectangle(0,0,radius * 2 * repetitions + 100 + x_0,radius + y_0 + 100));
-    // g2d.setPaint(Color.black);
 
     for ( int r = 0; r < repetitions; r++ ) {
 
@@ -196,12 +195,9 @@ public void paint(Graphics g) {
 
         for (double step = 0; step < 35; step++ ) {
 
-          //g2d.setPaint(Color.white);
           transfIntermed = new AffineTransform( interpola( matrizInicial, matrizFinal, step/35) );
           s = transfIntermed.createTransformedShape(quad);
           
-          //g2d.fill(s);
-
           limpaJanela(g2d, aux);
           g2d.setPaint(Color.black);          
           g2d.fill(s);
@@ -235,20 +231,13 @@ public void limpaJanela(Graphics2D g, Shape a)
  {
     if (a != null) {
 
-      // congela(10);
+      Rectangle2D.Double tmp = (Rectangle2D.Double)a.getBounds2D();
 
-       Rectangle2D.Double tmp = (Rectangle2D.Double)a.getBounds2D();
-
-       double x = tmp.getX();
-       double y = tmp.getY();
-
-      //g.clearRect(x, y,  40,  40);
-
-
+     double x = tmp.getX();
+     double y = tmp.getY();
      g.setPaint(Color.white);
      g.fill(new Rectangle2D.Double(x - 5, y - 5, 30, 30));
-     //g.fill(new Rectangle(0,0,radius * 2 * repetitions + 100 + x_0,radius + y_0 + 100));
-     // g.draw(new Rectangle2D.Double(x, y, 40, 40)); 
+
     }
 }
 
