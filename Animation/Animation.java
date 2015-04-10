@@ -133,9 +133,6 @@ private void calculateInterpolationPoints(Point pf, int jump, int i ,int r ) {
       pf.set_x(point_list.get((i * jump ) + jump ).get_x() + r);
       pf.set_y(point_list.get((i * jump ) + jump ).get_y()); 
     }
-
-    System.out.format("(%d, %d)\t%d\n",pf.get_x(), pf.get_y(), i );
-
 }
 
 public void paint(Graphics g) {
@@ -152,15 +149,11 @@ public void paint(Graphics g) {
     double jump_delta = size / segments;
 
     double remainder = size % segments;
-    double jump_alfa = jump_delta / remainder;
+    double jump_alfa = (int)(remainder/jump_delta);
 
-    int jump = (int)Math.ceil(jump_alfa + jump_delta);
-    //int jump = (int)(jump_alfa + jump_delta);
+    int jump = (int) jump_delta;
 
-    segments = (int)(size / (jump_alfa + jump_delta));
-
-
-    System.out.format("points %d seg: %d  jump: %d  the_jump: %f remainder: %f\n", point_list.size(), segments, jump, jump_alfa + jump_delta, remainder);
+    segments = segments + (int)jump_alfa;
 
     pi.set_x(point_list.get(0).get_x());
     pi.set_y(point_list.get(0).get_y());
@@ -192,8 +185,8 @@ public void paint(Graphics g) {
 
     Flag turn = new Flag(true);
 
-     g2d.setPaint(Color.white);
-     g2d.fill(new Rectangle(0,0,radius * 2 * repetitions + 100 + x_0,radius + y_0 + 100));
+    g2d.setPaint(Color.white);
+    g2d.fill(new Rectangle(0,0,radius * 2 * repetitions + 100 + x_0,radius + y_0 + 100));
 
     for ( int r = 0; r < repetitions; r++ ) {
 
@@ -223,11 +216,8 @@ public void paint(Graphics g) {
         
         tracking.setToIdentity();
 
-        for (int i = 0; i < 6; i++ ) matrizInicial[i] = matrizFinal[i];
-        
+        for (int i = 0; i < 6; i++ ) matrizInicial[i] = matrizFinal[i];        
       }
-   
-      System.out.format("Repts: %d\n", repetitions); 
            
     }
 
