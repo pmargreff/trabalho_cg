@@ -149,19 +149,18 @@ public void paint(Graphics g) {
 
     double size = (double)point_list.size();
 
-
     double jump_delta = size / segments;
-
 
     double remainder = size % segments;
     double jump_alfa = jump_delta / remainder;
 
-    int jump = (int) (jump_alfa + jump_delta);
+    int jump = (int)Math.ceil(jump_alfa + jump_delta);
+    //int jump = (int)(jump_alfa + jump_delta);
 
-    //segments = (int) Math.ceil( size / (jump_alfa + jump_delta));
+    segments = (int)(size / (jump_alfa + jump_delta));
 
 
-    System.out.format("points %d seg: %d  jump: %d  the_jump: %f\n", point_list.size(), segments, jump, jump_alfa + jump_delta);
+    System.out.format("points %d seg: %d  jump: %d  the_jump: %f remainder: %f\n", point_list.size(), segments, jump, jump_alfa + jump_delta, remainder);
 
     pi.set_x(point_list.get(0).get_x());
     pi.set_y(point_list.get(0).get_y());
