@@ -95,20 +95,15 @@ private void calculateTransformations(Point pf, Flag turn, AffineTransform t) {
     origem.setToTranslation(x_0,y_0);
     
     AffineTransform at = AffineTransform.getRotateInstance(-Math.PI / 4,pf.get_x() ,pf.get_y() );
-    
-      AffineTransform scaling = new AffineTransform();
-      t.concatenate(origem);
-      t.concatenate(at);
-      t.concatenate(tr);
-      t.scale(1.5,1.5);
+  
+    t.concatenate(origem);
+    t.concatenate(at);
+    t.concatenate(tr);
+    t.scale(1.5,1.5);
 
       turn.set_value(false); 
    
   } else {
-
-    AffineTransform scaling = new AffineTransform();
-    scaling.setToScale(10.0/15.0,10.0/15.0);
-    
     AffineTransform origem = new AffineTransform();
     origem.setToTranslation(x_0,y_0);
     
@@ -116,7 +111,7 @@ private void calculateTransformations(Point pf, Flag turn, AffineTransform t) {
     t.concatenate(origem);
     t.concatenate(at);
     t.concatenate(tr);
-    
+
     turn.set_value(true);
   }
 }
