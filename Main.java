@@ -12,16 +12,15 @@ public class Main {
 			int x_center	= Integer.parseInt(argv[3]);
 			int y_center	= Integer.parseInt(argv[4]);
 
+			int width  = radius * 2 * repetitions + 100 + x_center;
+			int height = radius + y_center + 100;
+			
 			x_center = x_center - radius;
-
 
 			if ( segments < 2 ) segments = 2;
 			if ( repetitions < 1 ) repetitions = 1;
 			if ( radius < 2 ) radius = 2;
-
-			int width  = radius * 2 * repetitions + 100 + x_center;
-			int height = radius + y_center + 100;
-
+			
 			Animation scene = new Animation(radius, segments, repetitions, x_center, y_center);
 
 	    	scene.setTitle("CG Trabalho I - Bruno e Pablo");

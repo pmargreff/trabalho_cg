@@ -1,3 +1,4 @@
+
 package Animation;
 
 import java.awt.*;
@@ -74,8 +75,8 @@ private ArrayList<Point> calculateBrasenham() {
       for (int i = 0; i < final_list.size(); i++ ) {
 
           Point tmp = final_list.get(i);
-          final_list.get(i).set_x(tmp.get_x() + x_0 + radius);
-          final_list.get(i).set_y(tmp.get_y() + y_0);
+          final_list.get(i).set_x(tmp.get_x() + radius);
+          final_list.get(i).set_y(tmp.get_y() );
       }
 
 
@@ -181,7 +182,7 @@ public void paint(Graphics g) {
     Flag turn = new Flag(true);
 
     g2d.setPaint(Color.white);
-    g2d.fill(new Rectangle(0,0,radius * 2 * repetitions + 100 + x_0,radius + y_0 + 100));
+    g2d.fill(new Rectangle(0,0,radius * 2 * repetitions + 100 + x_0 + radius,radius + y_0 + 100));
 
     for ( int r = 0; r < repetitions; r++ ) {
 
