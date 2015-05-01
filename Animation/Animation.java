@@ -6,256 +6,137 @@ import java.awt.geom.*;
 import java.util.Date; 
 import java.util.ArrayList;
 import Point.Point;
-import java.util.Collections;
+import java.util.*;
 
 
-public class Animation extends Frame {
-
-public Animation(  int r, int s, int n, int x, int y ) {
-
-    this.radius      = r;
-    this.segments    = s;
-    this.repetitions = n;
-    this.x_0         = x;  
-    this.y_0         = y;  
-
-    point_list = calculateBrasenham();
-
-    addWindowListener(new MyFinishWindow());
-    
-  }
-
-private ArrayList<Point> calculateBrasenham() {
-
-      ArrayList<Point> left_half  = new ArrayList<Point>(); 
-      ArrayList<Point> rigth_half = new ArrayList<Point>();
-
-      int x = 0;
-      int y = radius;
-      int decision_var = 1 - radius;
-      
-      rigth_half.add( new Point(x , y  ) );
-
-      while ( y > x ) {
-
-        x++;
-
-        if (decision_var < 0) {
-          decision_var += 2 * x + 3;
-        } else {
-
-          decision_var += 2 * ( x - y ) + 5;
-          y--;
-        }
-
-        rigth_half.add( new Point(x , y ) );      
-      }
-
-      for (Point tmp : rigth_half ) {
-         left_half.add( 0,  new Point( tmp.get_y() , tmp.get_x() ));
-      }
-      
-      ArrayList<Point> final_list = new ArrayList<Point>();
-
-      for (Point tmp : left_half) {
-        final_list.add(0, new Point( -tmp.get_x(), tmp.get_y()) );
-      }
-
-      int size = rigth_half.size() - 1;
-
-      for (int i = size; i > 0; i-- ) {
-        final_list.add( new Point( -rigth_half.get(i).get_x() , rigth_half.get(i).get_y() ) );
-      }
-      
-      rigth_half.addAll(left_half);
-
-      final_list.addAll(rigth_half);
+//Animation(cc, tracker, turn, delay, origin, semiCircle.getNextSegmentPoint(j, shift)
 
 
-      for (int i = 0; i < final_list.size(); i++ ) {
+// TODO: ta uma bosta o codigo, refatorar os nomes;
 
-          Point tmp = final_list.get(i);
-          final_list.get(i).set_x(tmp.get_x() + radius);
-          final_list.get(i).set_y(tmp.get_y() );
-      }
+public class Animation extends TimerTask {
 
 
-      return final_list;
+  private CCanvas stage;
 
-  }
+  private AffineTransform rotation;
+  private AffineTransform translation;
+  private AffineTransform tracker;
+  private Point o, n;
+  private Flag b;
 
-private void calculateTransformations(Point pf, Flag turn, AffineTransform t) {
 
-  AffineTransform tr = new AffineTransform();
+  public Animation( CCanvas c, AffineTransform t, Flag b, Point o, Point n ) {
+
+    this.stage   = c;  
+    this.tracker = t;
+    this.o = new Point(o.get_x(),o.get_y() );
+    this.n = new Point(n.get_x(),n.get_y() );
+    this.b = new Flag(b.get_value());
+
+
+    //c.normalizeCoords(); // nao ta implementado;
+
+
+    /* modificar usando o objeto canvas no lugar apropriado
+
+    g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);    chamado no canvas
   
-  tr.setToTranslation(pf.get_x(), pf.get_y());      
-
-  if ( turn.get_value() == true ) {
-
-    AffineTransform origem = new AffineTransform();
-    origem.setToTranslation(x_0,y_0);
+    */
     
-    AffineTransform at = AffineTransform.getRotateInstance(-Math.PI / 4,pf.get_x() ,pf.get_y() );
-  
-    t.concatenate(origem);
-    t.concatenate(at);
-    t.concatenate(tr);
-    t.scale(1.5,1.5);
-
-      turn.set_value(false); 
-   
-  } else {
-    AffineTransform origem = new AffineTransform();
-    origem.setToTranslation(x_0,y_0);
-    
-    AffineTransform at = AffineTransform.getRotateInstance(0,pf.get_x() ,pf.get_y() );
-    t.concatenate(origem);
-    t.concatenate(at);
-    t.concatenate(tr);
-
-    turn.set_value(true);
   }
-}
 
-private void calculateInterpolationPoints(Point pf, int jump, int i ,int r ) {
 
-    int size = point_list.size() - 1;
+/*
 
-    if ( (i * jump  + jump) > size ) {
-      pf.set_x(point_list.get(size).get_x() + r);
-      pf.set_y(point_list.get(size).get_y());
-       
+  // the valores pequenos:
+    
+    Scala com 50 de delay
+    >>> 15 / (0.03 * 50.0)
+    10.0
+    >>> 10 * (0.03 * 50.0)
+    15.0
+
+   logo: ScaleValueInTurn 
+
+
+   r_{i + 1} = r_{i} / (factor), if turn == true and let factor be 0.03 * delay
+   r_{i + 1} = r_{i} * (factor), if turn == false and let factor be 0.03 * delay
+  
+
+  rotacao com 50 de delay
+  radians(-45)/delay, if turn == true
+  radians(45)/delay, if turn == false
+
+
+  //valores quebrados e pequenos
+  // Group A
+  scale_10;
+  rotate_45;
+
+  //valores quebrados e pequenos
+  // Group B
+  scale_15;
+  rotate_45R;
+
+  accumlator;
+
+  if ( turn )
+    acumulator.concatane ( Group A)
+  else
+    acumulator.concatane ( Group B)  
+
+
+
+   for (repetitions)
+    for (segments)
+    Timer t = new Timer();
+    // passa repetitions e calcular shitfts (constroi a animacao para uma repeticao detarminada por 'repetition' e escalona)
+    t.scheduleAtFixedRate(new DoubleBufferingClockExample(bid, backGround, height, delay),0,delay); 
+
+
+*/
+
+
+
+  @Override
+  public void run() {
+      //this.rotation    = new AffineTransform();
+    this.translation = new AffineTransform();
+    
+    this.translation.setToTranslation(n.get_x(), n.get_y());  // concatenar por ultimo
+
+    
+    AffineTransform origem = new AffineTransform();
+    origem.setToTranslation(o.get_x(), o.get_y());
+
+
+    tracker.concatenate(origem); // primeira concatenacao
+
+    if ( b.get_value() == true ) {
+    
+      this.rotation = AffineTransform.getRotateInstance((-Math.PI/4), n.get_x(), n.get_y() );
+
+      tracker.concatenate(rotation);
+      tracker.concatenate(translation);
+      tracker.scale(1.5, 1.5);
+  
+      b.set_value(false);
+
     } else {
-      pf.set_x(point_list.get((i * jump ) + jump ).get_x() + r);
-      pf.set_y(point_list.get((i * jump ) + jump ).get_y()); 
-    }
-}
 
-public void paint(Graphics g) {
+      this.rotation = AffineTransform.getRotateInstance( 0, n.get_x(), n.get_y() );
+      tracker.concatenate(rotation);
 
-    Graphics2D g2d = (Graphics2D) g;
-
-    g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-  
-    Point pi = new Point();
-    Point pf = new Point();
-
-    double size = (double)point_list.size();
-
-    double jump_delta = size / segments;
-
-    double remainder = size % segments;
-    double jump_alfa = (int)(remainder/jump_delta);
-
-    int jump = (int) jump_delta;
-
-    segments = segments + (int)jump_alfa;
-
-    pi.set_x(point_list.get(0).get_x());
-    pi.set_y(point_list.get(0).get_y());
-
-    Rectangle2D.Double quad = new Rectangle2D.Double(0, 0, 10 , 10);
-
-    AffineTransform normalizer = new AffineTransform();
-    normalizer.setToScale(1, -1);
-
-    AffineTransform translate = new AffineTransform();
-    translate.setToTranslation(0, y_0 + radius + 100);
-    normalizer.preConcatenate(translate);
-
-    g2d.transform(normalizer);
-
-    Shape s;
-    
-    double[] matrizInicial = new double[6];
-    double[] matrizFinal   = new double[6];
-
-    AffineTransform inicialTranformation = new AffineTransform();
-
-    AffineTransform tracking = new AffineTransform();
-
-    AffineTransform  transfIntermed;
-
-    inicialTranformation.setToTranslation(x_0 + pi.get_x(), y_0 + pi.get_y());
-    inicialTranformation.getMatrix(matrizInicial); 
-
-    Flag turn = new Flag(true);
-
-    g2d.setPaint(Color.white);
-    g2d.fill(new Rectangle(0,0,radius * 2 * repetitions + 100 + x_0 + radius,radius + y_0 + 100));
-
-    for ( int r = 0; r < repetitions; r++ ) {
-
-      int shift = r * radius * 2;
-
-      for (int j = 0; j < segments; j++) {
-
-        calculateInterpolationPoints(pf, jump, j, shift);
-
-        calculateTransformations( pf, turn, tracking);
-       
-        tracking.getMatrix(matrizFinal);
-
-        Shape aux = null;
-
-        for (double step = 0; step < 35; step++ ) {
-
-          transfIntermed = new AffineTransform( interpola( matrizInicial, matrizFinal, step/35) );
-          s = transfIntermed.createTransformedShape(quad);
-          
-          limpaJanela(g2d, aux);
-          g2d.setPaint(Color.black);          
-          g2d.draw(s);
-          congela(10);
-          aux = s;
-        }
-        
-        tracking.setToIdentity();
-
-        for (int i = 0; i < 6; i++ ) matrizInicial[i] = matrizFinal[i];        
-      }
-           
+      b.set_value(true);
     }
 
+    // chamar atributos do canvas para imprimir o quadrado
 
-}
+    stage.g2dbi.setPaint(Color.black);
+    stage.g2dbi.fill(tracker.createTransformedShape(new Rectangle2D.Double(0,0, 10, 10)));
 
-public double[] interpola(double[] inicial,double[] terminal, double alfa) {
-    double[] intermed = new double[inicial.length];
+    stage.repaint();
 
-    for (int i=0; i<intermed.length; i++)
-    {
-      intermed[i] = (1-alfa)*inicial[i] + alfa*terminal[i];
-    }
-
-    return(intermed);
-}
-
-//método que limpa a janela
-public void limpaJanela(Graphics2D g, Shape a)
- {
-    if (a != null) {
-
-      Rectangle2D.Double tmp = (Rectangle2D.Double)a.getBounds2D();
-
-     double x = tmp.getX();
-     double y = tmp.getY();
-     g.setPaint(Color.white);
-     g.fill(new Rectangle2D.Double(x - 5, y - 5, 30, 30));
-
-    }
-}
-
-  //recebe o tempo em milissegundos
-  public void congela(long t)
-  {
-    long finish = (new Date()).getTime() + t;
-    while( (new Date()).getTime() < finish ){}
   }
-
-  private int radius;     
-  private int segments;   
-  private int repetitions;
-  private int x_0, y_0;
-  private ArrayList<Point> point_list;
 }
