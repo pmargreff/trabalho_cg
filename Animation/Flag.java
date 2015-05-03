@@ -1,5 +1,3 @@
-package Animation;
-
 public class Flag {
 
 	public Flag(boolean b) {
