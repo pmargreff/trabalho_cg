@@ -9,35 +9,37 @@ import java.util.Collections;
 
 public class Animation extends TimerTask
 {
-  //TODO 
-  //Fazer uma lista com todos os pontos ao invés de deslocar
+  
   //refatorar o código
-  //tirar as funções que não são usadas
   //ENCONTRAR PONTO DE PARADA
   //na verdade acho que preciso concertar a maneira de se mover, não apenas o ponte de parada ...
   
   //The window in which everything is shown.
   private BufferedImageDrawer buffid;
+  
   //The background image
   private BufferedImage bg;
+  
   //Length/width of the  quad
   private double quadSize;
+  
   //The quad of the  centred in the origin
   private Rectangle2D.Double quad;
-  //Rotação horária
-  private AffineTransform hRotation;
-  //Rotação Anti-horária
-  private AffineTransform aRotation;
+  
+  //Transformações aplicadas aos objetos
+  private AffineTransform clockwise;
+  private AffineTransform oppositeClockwise;
   private AffineTransform accumulatedRotation;
   private AffineTransform singleTranslation;
   private AffineTransform accumulatedTranslation;
   private AffineTransform quadTransform;
+  private AffineTransform origem;
 
-  Point pi ;
-  Point pf ;
-//This transformation is to combine the single transformations
-  //(rotation and translation) of the second quad.
-  AffineTransform origem;
+  //Lista do pontos para calculo do bresenham
+  private Point pi ;
+  private Point pf ;
+
+  
   Flag turn = new Flag(false);
 
   private int radius = 100;     
@@ -49,6 +51,8 @@ public class Animation extends TimerTask
   ArrayList<Point> point_list;
 
   double size ;
+
+  int shift = 0;  
 
   double jump_delta;
 
@@ -68,7 +72,7 @@ public class Animation extends TimerTask
   * @param delay        Defines after how many milliseconds the image/quad is 
   *                     is updated (needed for the synchronisation of the ).
   */
-  Animation(  int r, int s, int n, int x, int y , BufferedImageDrawer bid, BufferedImage backGround,int width, int height,int delay) {
+  Animation(int r, int s, int n, int x, int y , BufferedImageDrawer bid, BufferedImage backGround,int width, int height,int delay) {
     buffid = bid;
 
     this.radius      = r;
@@ -118,16 +122,16 @@ public class Animation extends TimerTask
 
     pi.set_x(point_list.get(0).get_x());
     pi.set_y(point_list.get(0).get_y());
-      quadSize = 30;
+    quadSize = 30;
 
       quad = new Rectangle2D.Double(-quadSize/2,-quadSize/2,
         quadSize,quadSize);
 
-      hRotation = new AffineTransform();
-      hRotation.setToRotation(-delay*Math.PI/5000);
+      clockwise = new AffineTransform();
+      clockwise.setToRotation(-delay*Math.PI/5000);
 
-      aRotation = new AffineTransform();
-      aRotation.setToRotation(delay*Math.PI/5000);
+      oppositeClockwise = new AffineTransform();
+      oppositeClockwise.setToRotation(delay*Math.PI/5000);
 
       accumulatedRotation = new AffineTransform();
 
@@ -253,7 +257,7 @@ public class Animation extends TimerTask
     public void run()
     {
 
-      // quadTransform.preConcatenate(accumulatedTranslation);
+    // quadTransform.preConcatenate(accumulatedTranslation);
       
 
      //Draw the background.
@@ -264,25 +268,28 @@ public class Animation extends TimerTask
      //This will update the image/quad in the window.
       buffid.repaint();
 
-      quadTransform.setToTranslation(x_0 + point_list.get(iterador).get_x(), y_0 + point_list.get(iterador).get_y());  
-
+      quadTransform.setToTranslation(shift + x_0 + point_list.get(iterador).get_x(), y_0 + point_list.get(iterador).get_y());  
+      if (iterador == (point_list.size()) - 1 ){
+        iterador = 0;
+        shift += radius * 2; 
+      }
      //Computation of the accumulated translation of the .
      //accumulatedTranslation.preConcatenate(singleTranslation);
       //fui tomar banho, estava por aqui tentando resolver o problema da rotação <<<<<<<<<<<<<<<<<<<<
      //Computation of the accumulated rotation of the second quad.
-     //accumulatedRotation.preConcatenate(hRotation);
+     //accumulatedRotation.preConcatenate(clockwise);
       //tr.setToTranslation(pf.get_x(), pf.get_y());      
 
 
       if ( turn.get_value() == true ) {
-       quadTransform.preConcatenate(hRotation);
-       if (iterador > 250){
+       quadTransform.preConcatenate(clockwise);
+       if (iterador > 350){
          turn.set_value(false);
          iterador = 0;
        }  
      } else {
-       quadTransform.preConcatenate(aRotation);
-       if (iterador > 250){
+       quadTransform.preConcatenate(oppositeClockwise);
+       if (iterador > 350){
          turn.set_value(true);
          iterador = 0;
        }

@@ -1,5 +1,3 @@
-package Animation;
-
 import java.awt.event.*;
 
 public class MyFinishWindow extends WindowAdapter

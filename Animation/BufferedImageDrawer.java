@@ -30,7 +30,7 @@ public class BufferedImageDrawer extends Frame
     g2dbi = bi.createGraphics();
 
     //Enables the closing of the window.
-    //addWindowListener(new MyFinishWindow());
+    addWindowListener(new MyFinishWindow());
 
     this.setTitle("Double-Buffering");
     this.setSize(width,height);
