@@ -313,7 +313,7 @@ public static void main(String[] argv)
     //The background.
     BufferedImage backGround = new BufferedImage(width,height,BufferedImage.TYPE_INT_RGB);
     Image theImage;
-    theImage = new javax.swing.ImageIcon("images.jpg").getImage();
+    theImage = new javax.swing.ImageIcon("fundo.jpg").getImage();
 
     backGround = new BufferedImage(width,
                               height  ,
