@@ -15,6 +15,7 @@ public class Animation extends TimerTask
   //The background image
   private BufferedImage bg;
   
+  
   //Length/width of the  quad
   private double quadSize;
   
@@ -311,6 +312,13 @@ public static void main(String[] argv)
 
     //The background.
     BufferedImage backGround = new BufferedImage(width,height,BufferedImage.TYPE_INT_RGB);
+    Image theImage;
+    theImage = new javax.swing.ImageIcon("images.jpg").getImage();
+
+    backGround = new BufferedImage(width,
+                              height  ,
+                              BufferedImage.TYPE_INT_RGB);
+   
     Graphics2D g2dBackGround = backGround.createGraphics();
 
     //The lines should have a thickness of 3.0 instead of 1.0.
@@ -319,9 +327,11 @@ public static void main(String[] argv)
     //The background is painted white first.
     g2dBackGround.setPaint(Color.white);
     g2dBackGround.fill(new Rectangle(0,0,width,height));
-
+    g2dBackGround.drawImage(theImage,-10,height - 155,null);
     //The window in which everything is drawn.
     BufferedImageDrawer bid = new BufferedImageDrawer(bi,width,height);
+
+
 
     //The TimerTask in which the repeated computations drawing take place.
     Animation scene = new Animation(radius, segments, repetitions, x_center, y_center, bid,backGround,width, height, delay);
