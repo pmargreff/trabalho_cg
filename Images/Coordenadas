@@ -11,21 +11,72 @@
     
     Steve Rogers
     
-    10 - //testa = 75 , 2
-    11 - //olho osquerdo = 65 , 50
-    12 - //olho direito = 80 , 50
-    13 - //busto = 75 , 70
-    14 - //queixo = 75 , 85
-    15 - //ombro esquerdo = 20 , 95
-    16 - //ombro direito = 125 , 95
+    10 - testa = 75 , 2
+    11 - olho osquerdo = 65 , 50
+    12 - olho direito = 80 , 50
+    13 - busto = 75 , 70
+    14 - queixo = 75 , 85
+    15 - ombro esquerdo = 20 , 95
+    16 - ombro direito = 125 , 95
 
     Capitão América
     
-    10 - //testa = 65 , 10
-    11 - //olho osquerdo = 55 , 45
-    12 - //olho direito = 72 , 45
-    13 - //busto = 62 , 62
-    14 - //queixo = 75 , 85
-    15 - //ombro esquerdo = 20 , 96
-    16 - //ombro direito = 115 , 90
+    10 - testa = 65 , 10
+    11 - olho osquerdo = 55 , 45
+    12 - olho direito = 72 , 45
+    13 - busto = 62 , 62
+    14 - queixo = 75 , 85
+    15 - ombro esquerdo = 20 , 96
+    16 - ombro direito = 115 , 90
+   
+    Bruce Banne 
     
+    10 - testa = 70 , 10
+    11 - olho osquerdo = 60 , 45
+    12 - olho direito = 80 , 50
+    13 - busto = 75 , 60
+    14 - queixo = 70 , 80
+    15 - ombro esquerdo = 25 , 100
+    16 - ombro direito = 125 , 95
+    
+    Hulk - Monstro
+    
+    10 - testa = 75 , 50
+    11 - olho osquerdo = 65 , 80
+    12 - olho direito = 90 , 80
+    13 - busto = 80 , 95
+    14 - queixo = 80 , 120
+    15 - ombro esquerdo = 25 , 85
+    16 - ombro direito = 120 , 90
+    
+
+    Hulk - Jogador
+    
+    10 - testa = 70 , 35
+    11 - olho osquerdo = 60 , 50
+    12 - olho direito = 80 , 50
+    13 - busto = 70 , 60
+    14 - queixo = 70 ,80
+    15 - ombro esquerdo = 30 , 95
+    16 - ombro direito = 120 , 95
+    
+    Tony Stark
+    
+    10 - testa = 75 , 15
+    11 - olho osquerdo = 65 , 35
+    12 - olho direito = 85 , 35
+    13 - busto = 75 , 50
+    14 - queixo = 75 , 65
+    15 - ombro esquerdo = 40 , 80
+    16 - ombro direito = 110 , 85
+    
+    Homem de ferro
+    
+    10 - testa = 95 , 20
+    11 - olho osquerdo = 85 , 40
+    12 - olho direito = 100 , 80
+    13 - busto = 90 , 60
+    14 - queixo = 90 , 75
+    15 - ombro esquerdo = 25 , 70
+    16 - ombro direito = 125 , 90
+        
