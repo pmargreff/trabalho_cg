@@ -91,13 +91,7 @@ public class Animation extends TimerTask {
   	buffid.g2dbi.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON); 
 
   	//Transforma as coordenadas
-  	AffineTransform normalizer = new AffineTransform();
-  	normalizer.setToScale(1, -1);
-  	AffineTransform translate = new AffineTransform();
-  	translate.setToTranslation(0, height);
-  	normalizer.preConcatenate(translate);
-
-  	buffid.g2dbi.transform(normalizer);
+  	buffid.g2dbi.transform(normalizedCoords(height));
 
   	buffid.g2dbi.setPaint(Color.black);
 
@@ -196,7 +190,6 @@ private void calculateInterpolationPoints(Point pf, int i ,int r ) {
 	Calcula uma aproximacao para o segmento baseado no 
 	numero de pontos no brasenham e ja calcula o jump (eh ruim fazer isso mas ..) ;
 */
-
 public int normalizedSegement(int s) {
 
 	int newSegment = 0;
@@ -216,8 +209,23 @@ public int normalizedSegement(int s) {
 
 }
 
+public AffineTransform normalizedCoords(int height) {
+
+	AffineTransform normalizer = new AffineTransform();
+  	normalizer.setToScale(1, -1);
+  	AffineTransform translate = new AffineTransform();
+  	translate.setToTranslation(0, height);
+  	normalizer.preConcatenate(translate);
+
+  	return normalizer;
+
+}
+
+/*
+	Isso aqui fica meio que em loop infinito, por isso teria que interromper. 
+	Ver como funciona o metodo: scheduleAtFixedRate();
+*/
 public void run() {
-  	//Flag turn = new Flag(true);
 
   	for ( int r = 0; r < repetitions; r++ ) {
 
@@ -234,8 +242,7 @@ public void run() {
   			Point interpolatedPoint = new Point();
   			
   			for (double step = 0; step < 70; step++ ) {
-  				if (alpha>=0 && alpha<=1)
-  				{
+  				if (alpha >= 0 && alpha <= 1) {
   					int castAux = (int) ((1 - alpha) * initialPoint.get_x() + alpha * pf.get_x());
   					interpolatedPoint.set_x(castAux);
   					
@@ -259,8 +266,11 @@ public void run() {
   		}
 
   	}
-  	int i = 0;
-  	while(i == i){}
+
+  	// Deveria interromper a thread, mas nao acontece por que essa classe nao herda de thread diretamente;	
+
+  	//int i = 0;
+  	//while(i == i){}
 }
 
 private void calculateTriangles(int imageWidth, int imageHeight){
@@ -690,7 +700,7 @@ public static void main(String[] argv) {
 
 
     //Specifies (in milliseconds) when the quad should be updated.
-		int delay = 100;
+		int delay = 10;
 
     //The BufferedImage to be drawn in the window.
 		BufferedImage bi = new BufferedImage(width,height,BufferedImage.TYPE_INT_RGB);
@@ -707,7 +717,7 @@ public static void main(String[] argv) {
     //The background is painted white first.
 		g2dBackGround.setPaint(Color.white);
 		g2dBackGround.fill(new Rectangle(0,0,width,height));
-		g2dBackGround.drawImage(theImage,-10,height - 155,null);
+		g2dBackGround.drawImage(theImage,-10,height - 155,null);	// - 155 ?
     //The window in which everything is drawn.
 		BufferedImageDrawer bid = new BufferedImageDrawer(bi,width,height);
 
