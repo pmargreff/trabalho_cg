@@ -455,7 +455,7 @@ public class Morphing extends TimerTask
   	    //pontos do rosto
   	ironMan2.tPoints[10] = new Point2D.Double(95,20);
   	ironMan2.tPoints[11] = new Point2D.Double(85,40);
-  	ironMan2.tPoints[12] = new Point2D.Double(100,80);
+  	ironMan2.tPoints[12] = new Point2D.Double(100,40);
   	ironMan2.tPoints[13] = new Point2D.Double(90,60);
   	ironMan2.tPoints[14] = new Point2D.Double(90,75);
   	ironMan2.tPoints[15] = new Point2D.Double(25,70);
@@ -703,7 +703,7 @@ public class Morphing extends TimerTask
   	hulk2.tPoints[9] = new Point2D.Double(110,125);
 
   	    //pontos do rosto
-  	hulk2.tPoints[10] = new Point2D.Double(75,50);
+  	hulk2.tPoints[10] = new Point2D.Double(75,10);
   	hulk2.tPoints[11] = new Point2D.Double(65,80);
   	hulk2.tPoints[12] = new Point2D.Double(90, 80);
   	hulk2.tPoints[13] = new Point2D.Double(80,95);
@@ -828,7 +828,7 @@ public class Morphing extends TimerTask
   	hulk3.tPoints[9] = new Point2D.Double(110,125);
 
   	    //pontos do rosto
-  	hulk3.tPoints[10] = new Point2D.Double(70,35);
+  	hulk3.tPoints[10] = new Point2D.Double(70,15);
   	hulk3.tPoints[11] = new Point2D.Double(60,50);
   	hulk3.tPoints[12] = new Point2D.Double(80, 50);
   	hulk3.tPoints[13] = new Point2D.Double(70,60);
@@ -930,7 +930,7 @@ public class Morphing extends TimerTask
   	 //The indexing for the triangles must be the same as in the
     //the first image.
   	//capitain2.triangles = capitain1.triangles;
-  	hulk3.triangles = ironMan2.triangles;
+  	//hulk3.triangles = ironMan2.triangles;
   }
 
   //This method is called in regular intervals. This method computes
@@ -943,7 +943,7 @@ public class Morphing extends TimerTask
   	if (alpha>=0 && alpha<=1)
   	{
       //Generate the interpolated image.
-  		mix = hulk2.mixWith(hulk3,alpha);
+  		mix = capitain2.mixWith(ironMan1,alpha);
 
       //Draw the interpolated image on the BufferedImage.
   		buffid.g2dbi.drawImage(mix,0,0,null);
