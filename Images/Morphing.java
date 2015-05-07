@@ -41,7 +41,7 @@ public class Morphing extends TimerTask
   	width = 150;
   	height = 130;
 
-  	steps = 20;
+  	steps = 100;
   	deltaAlpha = 1.0/steps;
   	alpha = 0;
 
@@ -714,93 +714,14 @@ public class Morphing extends TimerTask
   	    //Definition of the triangles.
   	hulk2.triangles = new int[22][3];
 
-  	hulk2.triangles[0][0] = 0;
-  	hulk2.triangles[0][1] = 10;
-  	hulk2.triangles[0][2] = 1;
+    for (int i = 0 ;i < 22 ; i++ ) {
+        
+        hulk2.triangles[i][0] = capitain1.triangles[i][0];
+        hulk2.triangles[i][1] = capitain1.triangles[i][1];
+        hulk2.triangles[i][2] = capitain1.triangles[i][2];
+      
+    }
 
-  	hulk2.triangles[1][0] = 0;
-  	hulk2.triangles[1][1] = 2;
-  	hulk2.triangles[1][2] = 10;
-
-  	hulk2.triangles[2][0] = 10;
-  	hulk2.triangles[2][1] = 1;
-  	hulk2.triangles[2][2] = 3;
-
-  	hulk2.triangles[3][0] = 2;
-  	hulk2.triangles[3][1] = 10;
-  	hulk2.triangles[3][2] = 11;
-
-  	hulk2.triangles[4][0] = 10;
-  	hulk2.triangles[4][1] = 11;
-  	hulk2.triangles[4][2] = 12;
-
-  	hulk2.triangles[5][0] = 10;
-  	hulk2.triangles[5][1] = 12;
-  	hulk2.triangles[5][2] = 3;
-
-  	hulk2.triangles[6][0] = 2;
-  	hulk2.triangles[6][1] = 11;
-  	hulk2.triangles[6][2] = 4;
-
-  	hulk2.triangles[7][0] = 4;
-  	hulk2.triangles[7][1] = 11;
-  	hulk2.triangles[7][2] = 13;
-
-  	hulk2.triangles[8][0] = 11;
-  	hulk2.triangles[8][1] = 12;
-  	hulk2.triangles[8][2] = 13;
-
-  	hulk2.triangles[9][0] = 12;
-  	hulk2.triangles[9][1] = 13;
-  	hulk2.triangles[9][2] = 5;
-
-  	hulk2.triangles[10][0] = 12;
-  	hulk2.triangles[10][1] = 3;
-  	hulk2.triangles[10][2] = 5;
-
-  	hulk2.triangles[11][0] = 4;
-  	hulk2.triangles[11][1] = 6;
-  	hulk2.triangles[11][2] = 15;
-
-  	hulk2.triangles[12][0] = 15;
-  	hulk2.triangles[12][1] = 4;
-  	hulk2.triangles[12][2] = 13;
-
-  	hulk2.triangles[13][0] = 13;
-  	hulk2.triangles[13][1] = 14;
-  	hulk2.triangles[13][2] = 15;
-
-  	hulk2.triangles[14][0] = 13;
-  	hulk2.triangles[14][1] = 14;
-  	hulk2.triangles[14][2] = 16;
-
-  	hulk2.triangles[15][0] = 13;
-  	hulk2.triangles[15][1] = 5;
-  	hulk2.triangles[15][2] = 16;
-
-  	hulk2.triangles[16][0] = 16;
-  	hulk2.triangles[16][1] = 5;
-  	hulk2.triangles[16][2] = 7;
-
-  	hulk2.triangles[17][0] = 6;
-  	hulk2.triangles[17][1] = 15;
-  	hulk2.triangles[17][2] = 8;
-
-  	hulk2.triangles[18][0] = 15;
-  	hulk2.triangles[18][1] = 14;
-  	hulk2.triangles[18][2] = 8;
-
-  	hulk2.triangles[19][0] = 8;
-  	hulk2.triangles[19][1] = 9;
-  	hulk2.triangles[19][2] = 14;
-
-  	hulk2.triangles[20][0] = 14;
-  	hulk2.triangles[20][1] = 16;
-  	hulk2.triangles[20][2] = 9;
-
-  	hulk2.triangles[21][0] = 16;
-  	hulk2.triangles[21][1] = 7;
-  	hulk2.triangles[21][2] = 9;
 
   	  	//Carrega Hulk - Monstro
   	  	//-----------------------------------------------------------------------------------------
@@ -943,7 +864,7 @@ public class Morphing extends TimerTask
   	if (alpha>=0 && alpha<=1)
   	{
       //Generate the interpolated image.
-  		mix = capitain2.mixWith(ironMan1,alpha);
+  		mix = hulk2.mixWith(hulk3,alpha);
 
       //Draw the interpolated image on the BufferedImage.
   		buffid.g2dbi.drawImage(mix,0,0,null);
