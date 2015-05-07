@@ -1,13 +1,29 @@
+/*
+	TODO: Verificar por que a imagem se desloca/pula quando a animacao inicia;
+	(parece que sai de 0,0 e vai para as coordenadas inicias)
+
+	TODO: Implementar uma estrutura otimizada para utilizar as imagens trianguladas e carregar as informacoes dos pontos de
+		  triangulacao;
+
+	TODO: Implementar logica de voltar/selecionar as imagens durante a tragetoria para o caso onde ha mais semi-circulos que
+		  imagens;
+
+	TODO: Verificar a necessidade de uma logica para parar o metodo run da classe animation (aparentemente necessario);
+	
+	TODO: Se der tempo, tentar centralizar a imagem do fundo e ver se eh possivel trabalhar com png para tirar o fundo da imagem;		
+
+	Docs:
+		Image tutorial: https://docs.oracle.com/javase/tutorial/2d/images/
+
+*/
+
 import java.awt.*;
 import java.awt.geom.*;
 import java.util.*;
 import java.awt.image.BufferedImage;
-import java.util.ArrayList;
-import java.util.Collections;
 
 
-public class Animation extends TimerTask
-{
+public class Animation extends TimerTask {
   //TODO list: 
   //corrigir erro do primeiro ponto
   //alterar imagens para passar todas
@@ -21,10 +37,6 @@ public class Animation extends TimerTask
   	//Variáveis para cálculo do bresenham
 	private Point pi;
 	private Point pf;
-	private double size;
-	private double jump_delta;
-	private double remainder;
-	private double jump_alfa;
 	private int jump;
 	private int shift = 0; //variávél responsável pelo controle do shift no @run  
 
@@ -67,11 +79,10 @@ public class Animation extends TimerTask
   * @param bid          The buffered image to be drawn
   * @param backGround   The background (buffered) image
   */
-  Animation(int r, int s, int n, int x, int y , BufferedImageDrawer bid, BufferedImage backGround,int width, int height,int delay) {
+ public Animation(int r, int s, int n, int x, int y , BufferedImageDrawer bid, BufferedImage backGround,int width, int height,int delay) {
   	buffid = bid;
 
   	this.radius      = r;
-  	this.segments    = s;
   	this.repetitions = n;
   	this.x_0         = x;  
   	this.y_0         = y;  
@@ -96,16 +107,8 @@ public class Animation extends TimerTask
   	pi = new Point();
   	pf = new Point();
   	point_list = calculateBrasenham();
-  	size = (double)point_list.size();
-
-  	jump_delta = size / segments;
-
-  	remainder = size % segments;
-  	jump_alfa = (int)(remainder/jump_delta);
-
-  	jump = (int) jump_delta;
-
-  	segments = segments + (int)jump_alfa;
+  	
+  	this.segments = normalizedSegement(s);
 
   	pi.set_x(point_list.get(0).get_x());
   	pi.set_y(point_list.get(0).get_y());
@@ -121,7 +124,7 @@ public class Animation extends TimerTask
   	alpha = 0;
   }
   
-  private ArrayList<Point> calculateBrasenham() {
+private ArrayList<Point> calculateBrasenham() {
 
   	ArrayList<Point> left_half  = new ArrayList<Point>(); 
   	ArrayList<Point> rigth_half = new ArrayList<Point>();
@@ -174,33 +177,46 @@ public class Animation extends TimerTask
   		final_list.get(i).set_y(tmp.get_y() + y_0);
   	}
   	return final_list;
-  }
+}
 
-  private void calculateInterpolationPoints(Point pf, int jump, int i ,int r ) {
+private void calculateInterpolationPoints(Point pf, int i ,int r ) {
   	int size = point_list.size() - 1;
 
-  	if ( (i * jump  + jump) > size ) {
+  	if ( (i * this.jump  + this.jump) > size ) {
   		pf.set_x(point_list.get(size).get_x() + r);
   		pf.set_y(point_list.get(size).get_y());
 
   	} else {
-  		pf.set_x(point_list.get((i * jump ) + jump ).get_x() + r);
-  		pf.set_y(point_list.get((i * jump ) + jump ).get_y()); 
+  		pf.set_x(point_list.get((i * this.jump ) + this.jump ).get_x() + r);
+  		pf.set_y(point_list.get((i * this.jump ) + this.jump ).get_y()); 
   	}
-  }
+}
 
-  public double[] interpola(double[] inicial,double[] terminal, double alfa) {
-  	double[] intermed = new double[inicial.length];
+/*
+	Calcula uma aproximacao para o segmento baseado no 
+	numero de pontos no brasenham e ja calcula o jump (eh ruim fazer isso mas ..) ;
+*/
 
-  	for (int i=0; i<intermed.length; i++)
-  	{
-  		intermed[i] = (1-alfa)*inicial[i] + alfa*terminal[i];
-  	}
-  	return(intermed);
-  }
+public int normalizedSegement(int s) {
 
-  public void run()
-  {
+	int newSegment = 0;
+
+	double size = (double)point_list.size();
+
+  	double jump_delta = size / s;
+
+  	double remainder = size % segments;
+  	double jump_alfa = (int)(remainder/jump_delta);
+
+  	this.jump = (int) jump_delta;
+
+  	newSegment = s + (int)jump_alfa;
+
+  	return newSegment;
+
+}
+
+public void run() {
   	//Flag turn = new Flag(true);
 
   	for ( int r = 0; r < repetitions; r++ ) {
@@ -213,7 +229,7 @@ public class Animation extends TimerTask
   			initialPoint.set_x(pf.get_x());
   			initialPoint.set_y(pf.get_y());
 
-  			calculateInterpolationPoints(pf, jump, j, shift);
+  			calculateInterpolationPoints(pf, j, shift);
 
   			Point interpolatedPoint = new Point();
   			
@@ -245,7 +261,7 @@ public class Animation extends TimerTask
   	}
   	int i = 0;
   	while(i == i){}
-  }
+}
 
 private void calculateTriangles(int imageWidth, int imageHeight){
 	Image loadedImage;
@@ -654,15 +670,14 @@ private void calculateTriangles(int imageWidth, int imageHeight){
   //o main tem que ficar aqui, 
   //não vai rodar em arquivo próprio por conflito na classe TaskTimer
   //contador_de_horas_tentando_deixar_o_main_em_um_arquivo_separado: +-8 horas
-public static void main(String[] argv)
-{
+public static void main(String[] argv) {
 	if ( argv.length == 5 ) {
 
-		int radius    = Integer.parseInt(argv[0]);
-		int segments  = Integer.parseInt(argv[1]);
+		int radius    	= Integer.parseInt(argv[0]);
+		int segments  	= Integer.parseInt(argv[1]);
 		int repetitions = Integer.parseInt(argv[2]);
-		int x_center  = Integer.parseInt(argv[3]);
-		int y_center  = Integer.parseInt(argv[4]);
+		int x_center  	= Integer.parseInt(argv[3]);
+		int y_center  	= Integer.parseInt(argv[4]);
 
 		int width  = radius * 2 * repetitions + 150 + x_center;
 		int height = radius + y_center + 150;
@@ -682,12 +697,7 @@ public static void main(String[] argv)
 
     //The background.
 		BufferedImage backGround = new BufferedImage(width,height,BufferedImage.TYPE_INT_RGB);
-		Image theImage;
-		theImage = new javax.swing.ImageIcon("fundo.jpg").getImage();
-
-		backGround = new BufferedImage(width,
-			height  ,
-			BufferedImage.TYPE_INT_RGB);
+		Image theImage = new javax.swing.ImageIcon("fundo.jpg").getImage();
 
 		Graphics2D g2dBackGround = backGround.createGraphics();
 
