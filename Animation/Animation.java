@@ -38,7 +38,6 @@ public class Animation extends TimerTask {
 	private Point pi;
 	private Point pf;
 	private int jump;
-	private int shift = 0; //variávél responsável pelo controle do shift no @run  
 
   	//Flag para marcar a rotação, e posteriormente a troca de imagens
 	Flag turn = new Flag(false);
@@ -74,6 +73,8 @@ public class Animation extends TimerTask {
 	private int steps;
   // Image loadedImage;
 
+	private int repetition_controller;
+
   /**
   * Constructor
   * @param bid          The buffered image to be drawn
@@ -85,7 +86,10 @@ public class Animation extends TimerTask {
   	this.radius      = r;
   	this.repetitions = n;
   	this.x_0         = x;  
-  	this.y_0         = y;  
+  	this.y_0         = y;
+  	this.repetition_controller = 0;
+
+
 
   	buffid.g2dbi.setStroke(new BasicStroke(1.5f));
   	buffid.g2dbi.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON); 
@@ -227,9 +231,17 @@ public AffineTransform normalizedCoords(int height) {
 */
 public void run() {
 
-  	for ( int r = 0; r < repetitions; r++ ) {
+  	//for ( int r = 0; r < repetitions; r++ ) {
+  	//for ( int r = 0; r < repetitions; r++ ) {
+  	
+  	if (repetitions > 0) {
+  		repetitions--;
+  		repetition_controller++;
 
-  		int shift = r * radius * 2;
+  		System.out.format("repetitions(%d) -- r(%d)\n", repetitions, repetition_controller);
+
+
+  		int shift = repetition_controller * radius * 2;
 
   		for (int j = 0; j < segments; j++) {
 
@@ -250,10 +262,10 @@ public void run() {
   					interpolatedPoint.set_y(castAux);
   				    
   				    // Generate the interpolated image.
-  					mix = capitain1.mixWith(capitain2,alpha);
+  					mix = capitain1.mixWith(capitain2,alpha);	// Aqui que calcula o mod para fazer a volta
 
   				    //Draw the interpolated image on the BufferedImage.
-  					buffid.g2dbi.drawImage(bg,0,0,null);
+  					//buffid.g2dbi.drawImage(bg,0,0,null);
   					buffid.g2dbi.drawImage(mix,interpolatedPoint.get_x(),interpolatedPoint.get_y(),null);
   				}
   				
@@ -265,6 +277,11 @@ public void run() {
 
   		}
 
+  	} else {
+
+  		System.out.println("Terminei");
+
+  		this.cancel();
   	}
 
   	// Deveria interromper a thread, mas nao acontece por que essa classe nao herda de thread diretamente;	
@@ -288,7 +305,7 @@ private void calculateTriangles(int imageWidth, int imageHeight){
 
 	  //Load the image and draw it on the corresponding BufferedImage.
 	loadedImage = new javax.swing.ImageIcon("capitain1.jpg").getImage();
-	g2dcapitain1.drawImage(loadedImage,0,0,null);
+	g2dcapitain1.drawImage(loadedImage, 0,0,null);
 
 	capitain1.tPoints = new Point2D[17];
 
@@ -413,7 +430,7 @@ private void calculateTriangles(int imageWidth, int imageHeight){
 
 	loadedImage = new javax.swing.ImageIcon("capitain2.jpg").getImage();
 
-	g2dcapitain2.drawImage(loadedImage,0,0,null);
+	g2dcapitain2.drawImage(loadedImage, 0,0,null);
 
 	capitain2.tPoints = new Point2D[17];
 
@@ -458,7 +475,7 @@ private void calculateTriangles(int imageWidth, int imageHeight){
 
 			    //Load the image and draw it on the corresponding BufferedImage.
 	loadedImage = new javax.swing.ImageIcon("ironMan1.jpg").getImage();
-	g2dironMan1.drawImage(loadedImage,0,0,null);
+	g2dironMan1.drawImage(loadedImage, 0,0,null);
 
 	ironMan1.tPoints = new Point2D[17];
 
@@ -504,7 +521,7 @@ private void calculateTriangles(int imageWidth, int imageHeight){
 
 			    //Load the image and draw it on the corresponding BufferedImage.
 	loadedImage = new javax.swing.ImageIcon("ironMan2.jpg").getImage();
-	g2dironMan2.drawImage(loadedImage,0,0,null);
+	g2dironMan2.drawImage(loadedImage, 0,0,null);
 
 	ironMan2.tPoints = new Point2D[17];
 
@@ -549,7 +566,7 @@ private void calculateTriangles(int imageWidth, int imageHeight){
 
 			    //Load the image and draw it on the corresponding BufferedImage.
 	loadedImage = new javax.swing.ImageIcon("hulk1.jpg").getImage();
-	g2dhulk1.drawImage(loadedImage,0,0,null);
+	g2dhulk1.drawImage(loadedImage, 0,0,null);
 
 	hulk1.tPoints = new Point2D[17];
 
@@ -594,7 +611,7 @@ private void calculateTriangles(int imageWidth, int imageHeight){
 
 			    //Load the image and draw it on the corresponding BufferedImage.
 	loadedImage = new javax.swing.ImageIcon("hulk2.jpg").getImage();
-	g2dhulk2.drawImage(loadedImage,0,0,null);
+	g2dhulk2.drawImage(loadedImage, 0,0,null);
 
 	hulk2.tPoints = new Point2D[17];
 
@@ -640,7 +657,7 @@ private void calculateTriangles(int imageWidth, int imageHeight){
 
 			    //Load the image and draw it on the corresponding BufferedImage.
 	loadedImage = new javax.swing.ImageIcon("hulk3.jpg").getImage();
-	g2dhulk3.drawImage(loadedImage,0,0,null);
+	g2dhulk3.drawImage(loadedImage, 0,0,null);
 
 	hulk3.tPoints = new Point2D[17];
 
@@ -703,7 +720,6 @@ public static void main(String[] argv) {
 		int delay = 10;
 
     //The BufferedImage to be drawn in the window.
-		BufferedImage bi = new BufferedImage(width,height,BufferedImage.TYPE_INT_RGB);
 
     //The background.
 		BufferedImage backGround = new BufferedImage(width,height,BufferedImage.TYPE_INT_RGB);
@@ -718,7 +734,9 @@ public static void main(String[] argv) {
 		g2dBackGround.setPaint(Color.white);
 		g2dBackGround.fill(new Rectangle(0,0,width,height));
 		g2dBackGround.drawImage(theImage,-10,height - 155,null);	// - 155 ?
+    
     //The window in which everything is drawn.
+		BufferedImage bi = new BufferedImage(width,height,BufferedImage.TYPE_INT_RGB);
 		BufferedImageDrawer bid = new BufferedImageDrawer(bi,width,height);
 
 
