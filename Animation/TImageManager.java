@@ -1,6 +1,15 @@
 /*
+	
+	Medir a produtividade olhando horarios de commit em python:
+		print datetime.strptime('17:23', '%H:%M') - datetime.strptime('15:29', '%H:%M')
+
+	TODO: Implementar matris de triangulos dinamicos;
+
+	TODO: 1. Testar a construcao das tabelas de pontos e imagens [Importante];
+
 	@docs:
 		- http://www.ocpsoft.org/opensource/guide-to-regular-expressions-in-java-part-1/
+		- http://stackoverflow.com/questions/12008986/sublime-text-2-how-to-delete-blank-empty-lines
 		
 */
 
@@ -71,25 +80,26 @@ private void buildTImageList() {
 
 		while( (line = pointFile.readLine()) != null) {
 
-			if (line.matches("<anchors>")) {
+			if (line.matches("<anchors>")) {				// Ta funcionando;
 
 				this.anchor_points = new ArrayList<Point2D>();
 
 				while((line = pointFile.readLine()) != null) {
 					if (line.matches("</anchors>")) break;
-					System.out.println(line);
+					//System.out.println(line);
 					String aPoints[] = line.split(" ");
 					this.anchor_points.add( new Point2D.Double( Integer.parseInt(aPoints[0]),
 														   Integer.parseInt(aPoints[1]) ));
 					
 				}
 
-			} else if (line.matches("<(\\w)+>")) {
+			} else if (line.matches("<(\\w)+>") && !line.equals("<mapped>") && !line.equals("<anchors>") ) {
 
 				String image_name = line.substring(1, line.length() - 1);
-				System.out.println(image_name);
 
-				this.tImages.add(createTImage(image_name + "." + fextension));		// nao testado					
+				this.tImages.add(createTImage(image_name + "." + fextension));						
+
+				//System.out.println("inserido: " + this.tImages.size());			
 
 				this.custom_points = new ArrayList<Point2D>(); 
 
@@ -103,7 +113,6 @@ private void buildTImageList() {
 							int anch_size  = this.anchor_points.size();
 							int total_size = anch_size + n_points;
 
-							//tImages.get(size).tPoints = new Point2D[n_points];	usei a ideia de alias, pode dar pau
 							TriangulatedImage current_img = this.tImages.get(size);
 
 							current_img.tPoints = new Point2D[total_size];	// mais os pontos ancora
@@ -112,11 +121,15 @@ private void buildTImageList() {
 								current_img.tPoints[i] = anchor_points.get(i);
 							}
 
+							int continuation = 0;
 							for (int i = anch_size; i < total_size; i++) {
-								current_img.tPoints[i] = custom_points.get(i);	// pode dar pau por causa da atribs
+								current_img.tPoints[i] = custom_points.get(continuation);	// pode dar pau por causa da atribs
+								continuation++;
 							}
 
-							// aqui acho que sao os triangulos que ele mapeou;
+							//System.out.println("ALL POINTS\n_____________________________________________\n");
+							//for (int i = 0; i < total_size; i++) System.out.println(current_img.tPoints[i]);
+
 							current_img.triangles = new int[22][3];		// nao sei se eh n_points : nao entendi isso aqui
 							
 							for (int j = 0; j < 22; j++) {
@@ -124,6 +137,14 @@ private void buildTImageList() {
 								current_img.triangles[j][1] = mapped_triangles[j][1];
 								current_img.triangles[j][2] = mapped_triangles[j][2];
 							}
+
+							/* Debugg
+							System.out.println("\n\nALL MAPPED TRIANGLES \n\n__________________________________");
+							for (int j = 0; j < 22; j++) {
+								System.out.format("Mapped[%d][0] = %d\n", j, current_img.triangles[j][0]);
+								System.out.format("Mapped[%d][1] = %d\n", j, current_img.triangles[j][1]);
+								System.out.format("Mapped[%d][2] = %d\n", j, current_img.triangles[j][2]);
+							}*/
 
 						}
 
@@ -136,13 +157,8 @@ private void buildTImageList() {
 					custom_points.add( new Point2D.Double(Integer.parseInt(inPoints[0]), Integer.parseInt(inPoints[1])) );			// acho que ta faltando cuidar as dimensoes
 				}
 
-			} else if(line.matches("<mapped>")) {
-
-				int p_line = 0;
-
-				while((line = pointFile.readLine()) != null) {
+			} else if(line.matches("<mapped>")) {							while((line = pointFile.readLine()) != null) {
 					if (line.matches("</mapped>")) break;
-					System.out.println(line);
 					
 					String mPoints[] = line.split(" ");
 
@@ -154,8 +170,8 @@ private void buildTImageList() {
 				}
 
 			}else {
-					System.out.println("Erro de sintaxe no arquivo de mapeamento dos triangulos.");
-					break;
+				System.out.println("Erro de sintaxe no arquivo de mapeamento dos triangulos.");
+				break;
 			}		
 
 		}
