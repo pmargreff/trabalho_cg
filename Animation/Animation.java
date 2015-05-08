@@ -225,29 +225,25 @@ public AffineTransform normalizedCoords(int height) {
 
 }
 
-/*
-	Isso aqui fica meio que em loop infinito, por isso teria que interromper. 
-	Ver como funciona o metodo: scheduleAtFixedRate();
-*/
 public void run() {
 
-  	//for ( int r = 0; r < repetitions; r++ ) {
-  	//for ( int r = 0; r < repetitions; r++ ) {
-  	
+	/*
+		Acho que o problema da interpolacao pode ser corrigido assim:
+		devo calcular o ponto inicial antes de começar a interpolaçao, usando o pi;
+	*/
+
+	
   	if (repetitions > 0) {
   		repetitions--;
-  		repetition_controller++;
-
-  		System.out.format("repetitions(%d) -- r(%d)\n", repetitions, repetition_controller);
-
 
   		int shift = repetition_controller * radius * 2;
 
-  		for (int j = 0; j < segments; j++) {
+  		// Os problemas devem estar ligados a isso;
+		Point initialPoint = new Point();
+		initialPoint.set_x(pi.get_x());
+		initialPoint.set_y(pi.get_y() + shift);
 
-  			Point initialPoint = new Point();
-  			initialPoint.set_x(pf.get_x());
-  			initialPoint.set_y(pf.get_y());
+  		for (int j = 0; j < segments; j++) {
 
   			calculateInterpolationPoints(pf, j, shift);
 
@@ -261,8 +257,11 @@ public void run() {
   					castAux = (int) ((1 - alpha) * initialPoint.get_y() + alpha * pf.get_y());
   					interpolatedPoint.set_y(castAux);
   				    
-  				    // Generate the interpolated image.
-  					mix = capitain1.mixWith(capitain2,alpha);	// Aqui que calcula o mod para fazer a volta
+  				    /* Calcula a interpolacao entre a imagem atual e a proxima (fechando, assim, um segmento), 
+  				    respeitando o numero de imagens que existem para interpolar por meio do 
+  				    */ 
+
+  					mix = capitain1.mixWith(capitain2,alpha);	
 
   				    //Draw the interpolated image on the BufferedImage.
   					//buffid.g2dbi.drawImage(bg,0,0,null);
@@ -273,21 +272,20 @@ public void run() {
   				alpha = alpha+deltaAlpha;
   			}
 
-  			alpha = 0;
+  			initialPoint.set_x(pf.get_x());
+  			initialPoint.set_y(pf.get_y());
 
+  			alpha = 0;
   		}
 
+  		repetition_controller++;
+
+
   	} else {
-
-  		System.out.println("Terminei");
-
+  		// Termina a excecucao quando chega no numero maximo de repeticoes;
   		this.cancel();
   	}
 
-  	// Deveria interromper a thread, mas nao acontece por que essa classe nao herda de thread diretamente;	
-
-  	//int i = 0;
-  	//while(i == i){}
 }
 
 private void calculateTriangles(int imageWidth, int imageHeight){
@@ -305,6 +303,14 @@ private void calculateTriangles(int imageWidth, int imageHeight){
 
 	  //Load the image and draw it on the corresponding BufferedImage.
 	loadedImage = new javax.swing.ImageIcon("capitain1.jpg").getImage();
+
+	//g2dcapitain1.transform(normalizedCoords(imageHeight));	// para corrigir as imagens que ficaram de cabeca para baixo;
+
+	AffineTransform tr = new AffineTransform();
+	tr.setToTranslation(pi.get_x(), pi.get_y());
+
+	g2dcapitain1.transform(tr);
+
 	g2dcapitain1.drawImage(loadedImage, 0,0,null);
 
 	capitain1.tPoints = new Point2D[17];
@@ -429,6 +435,8 @@ private void calculateTriangles(int imageWidth, int imageHeight){
 	Graphics2D g2dcapitain2 = capitain2.bi.createGraphics();
 
 	loadedImage = new javax.swing.ImageIcon("capitain2.jpg").getImage();
+
+	g2dcapitain2.transform(tr);
 
 	g2dcapitain2.drawImage(loadedImage, 0,0,null);
 
