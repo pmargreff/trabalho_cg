@@ -240,8 +240,8 @@ public void run() {
 
   		// Os problemas devem estar ligados a isso;
 		Point initialPoint = new Point();
-		initialPoint.set_x(pi.get_x());
-		initialPoint.set_y(pi.get_y() + shift);
+		initialPoint.set_x(pi.get_x() + shift);
+		initialPoint.set_y(pi.get_y());
 
   		for (int j = 0; j < segments; j++) {
 
