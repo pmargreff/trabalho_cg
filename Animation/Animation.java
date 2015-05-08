@@ -1,14 +1,12 @@
 /*
-	TODO: Verificar por que a imagem se desloca/pula quando a animacao inicia;
-	(parece que sai de 0,0 e vai para as coordenadas inicias)
 
-	TODO: Implementar uma estrutura otimizada para utilizar as imagens trianguladas e carregar as informacoes dos pontos de
+	TODO: [ Importante ] Implementar uma estrutura otimizada para utilizar as imagens trianguladas e carregar as informacoes dos pontos de
 		  triangulacao;
+
+	TODO: Resolver a questao do numero de imagens e da aplicacao do delay [Importante]
 
 	TODO: Implementar logica de voltar/selecionar as imagens durante a tragetoria para o caso onde ha mais semi-circulos que
 		  imagens;
-
-	TODO: Verificar a necessidade de uma logica para parar o metodo run da classe animation (aparentemente necessario);
 	
 	TODO: Se der tempo, tentar centralizar a imagem do fundo e ver se eh possivel trabalhar com png para tirar o fundo da imagem;		
 
@@ -227,12 +225,6 @@ public AffineTransform normalizedCoords(int height) {
 
 public void run() {
 
-	/*
-		Acho que o problema da interpolacao pode ser corrigido assim:
-		devo calcular o ponto inicial antes de começar a interpolaçao, usando o pi;
-	*/
-
-	
   	if (repetitions > 0) {
   		repetitions--;
 
