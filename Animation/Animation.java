@@ -202,7 +202,7 @@ public int normalizedSegement(int s) {
 
   	double jump_delta = size / s;
 
-  	double remainder = size % segments;
+  	double remainder = size % s;
   	double jump_alfa = (int)(remainder/jump_delta);
 
   	this.jump = (int) jump_delta;
@@ -238,7 +238,6 @@ public void run() {
 
   		int shift = repetition_controller * radius * 2;
 
-  		// Os problemas devem estar ligados a isso;
 		Point initialPoint = new Point();
 		initialPoint.set_x(pi.get_x() + shift);
 		initialPoint.set_y(pi.get_y());
