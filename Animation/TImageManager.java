@@ -58,7 +58,11 @@ public TriangulatedImage getNext(int index) {
 }
 
 public TriangulatedImage get(int index) {
-	if (index >= 0 && index <= this.size) return tImages.get(index);
+	if (index >= 0 && index <= this.size) {
+		return tImages.get(index);
+	}
+
+	return null;
 }
 
 private TriangulatedImage createTImage(String imgName) {
@@ -72,7 +76,6 @@ private TriangulatedImage createTImage(String imgName) {
 	img_loader.transform(normalizedCoords(imageHeight));  // coloca as imagens em sua coordenada correta;
 	img_loader.drawImage(loadedImage, 0,0,null);		  // Desenha na imagem bufferizada a imagem carregada	
 
-	System.out.println(imgName);
 
 	return tmp;
 }
@@ -92,7 +95,6 @@ private void buildTImageList() {
 
 				while((line = pointFile.readLine()) != null) {
 					if (line.matches("</anchors>")) break;
-					//System.out.println(line);
 					String aPoints[] = line.split(" ");
 					this.anchor_points.add( new Point2D.Double( Integer.parseInt(aPoints[0]),
 														   Integer.parseInt(aPoints[1]) ));
@@ -104,8 +106,6 @@ private void buildTImageList() {
 				String image_name = line.substring(1, line.length() - 1);
 
 				this.tImages.add(createTImage(image_name + "." + fextension));						
-
-				System.out.println("inserido: " + this.tImages.size());			
 
 				this.custom_points = new ArrayList<Point2D>(); 
 
@@ -133,22 +133,12 @@ private void buildTImageList() {
 								continuation++;
 							}
 
-							System.out.println("ALL POINTS\n_____________________________________________\n");
-							for (int i = 0; i < total_size; i++) System.out.println(current_img.tPoints[i]);
-
 							current_img.triangles = new int[22][3];		// nao sei se eh n_points : nao entendi isso aqui
 							
 							for (int j = 0; j < 22; j++) {
 								current_img.triangles[j][0] = mapped_triangles[j][0];
 								current_img.triangles[j][1] = mapped_triangles[j][1];
 								current_img.triangles[j][2] = mapped_triangles[j][2];
-							}
-
-							System.out.println("\n\nALL MAPPED TRIANGLES \n\n__________________________________");
-							for (int j = 0; j < 22; j++) {
-								System.out.format("Mapped[%d][0] = %d\n", j, current_img.triangles[j][0]);
-								System.out.format("Mapped[%d][1] = %d\n", j, current_img.triangles[j][1]);
-								System.out.format("Mapped[%d][2] = %d\n", j, current_img.triangles[j][2]);
 							}
 
 						}
