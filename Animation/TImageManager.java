@@ -1,9 +1,7 @@
 /*
-	TODO: Implementar tratamento de pontos ancora;
-	TODO: Criar metodo para melhorar construcao das imagens trianguladas;
-	TODO: Testar;
-
-	@docs: http://www.ocpsoft.org/opensource/guide-to-regular-expressions-in-java-part-1/
+	@docs:
+		- http://www.ocpsoft.org/opensource/guide-to-regular-expressions-in-java-part-1/
+		
 */
 
 import java.io.*;
@@ -19,7 +17,7 @@ public class TImageManager {
 	private int imageHeight;
 	private int imageWidth;
 	private int size;
-	private int N_ANCHOR_POINTS;
+	private int[][] mapped_triangles;
 	private String fextension;
 	private String dir_path;
 	private String data_file;
@@ -30,14 +28,17 @@ public class TImageManager {
 
 public TImageManager (String dp, String df, String ext, int w, int h) {
 
-	this.size            = 0;
-	this.N_ANCHOR_POINTS = 0;
-	this.dir_path    	 = dp;
-	this.data_file   	 = df;
-	this.fextension  	 = ext;
-	this.imageWidth  	 = w;
-	this.imageHeight 	 = h;
-	this.tImages         = new ArrayList<TriangulatedImage>();
+	this.size             = 0;
+	this.dir_path    	  = dp;
+	this.data_file   	  = df;
+	this.fextension  	  = ext;
+	this.imageWidth  	  = w;
+	this.imageHeight 	  = h;
+	this.tImages          = new ArrayList<TriangulatedImage>();
+	/*
+		Por enquanto mapped_triangles esta estatico, logo, no arquivo de configuracao, tem que ter 22 obrigatoriamento; 
+	*/
+	this.mapped_triangles = new int[22][3];
 
 	buildTImageList();
 }
@@ -80,7 +81,9 @@ private void buildTImageList() {
 					String aPoints[] = line.split(" ");
 					this.anchor_points.add( new Point2D.Double( Integer.parseInt(aPoints[0]),
 														   Integer.parseInt(aPoints[1]) ));
+					
 				}
+
 			} else if (line.matches("<(\\w)+>")) {
 
 				String image_name = line.substring(1, line.length() - 1);
@@ -113,11 +116,14 @@ private void buildTImageList() {
 								current_img.tPoints[i] = custom_points.get(i);	// pode dar pau por causa da atribs
 							}
 
-
 							// aqui acho que sao os triangulos que ele mapeou;
 							current_img.triangles = new int[22][3];		// nao sei se eh n_points : nao entendi isso aqui
-							// preenche aqui com os triangulos padroes que seram carregados uma vez
-
+							
+							for (int j = 0; j < 22; j++) {
+								current_img.triangles[j][0] = mapped_triangles[j][0];
+								current_img.triangles[j][1] = mapped_triangles[j][1];
+								current_img.triangles[j][2] = mapped_triangles[j][2];
+							}
 
 						}
 
@@ -130,8 +136,26 @@ private void buildTImageList() {
 					custom_points.add( new Point2D.Double(Integer.parseInt(inPoints[0]), Integer.parseInt(inPoints[1])) );			// acho que ta faltando cuidar as dimensoes
 				}
 
-			} else {
-					System.out.println("dorgassss");
+			} else if(line.matches("<mapped>")) {
+
+				int p_line = 0;
+
+				while((line = pointFile.readLine()) != null) {
+					if (line.matches("</mapped>")) break;
+					System.out.println(line);
+					
+					String mPoints[] = line.split(" ");
+
+					this.mapped_triangles[p_line][0] = Integer.parseInt(mPoints[0]);
+					this.mapped_triangles[p_line][1] = Integer.parseInt(mPoints[1]);
+					this.mapped_triangles[p_line][2] = Integer.parseInt(mPoints[2]);
+
+					p_line++;
+				}
+
+			}else {
+					System.out.println("Erro de sintaxe no arquivo de mapeamento dos triangulos.");
+					break;
 			}		
 
 		}
@@ -157,9 +181,9 @@ public int getSize() {
 }
 
 
-	public static void main(String argv[]) {
+public static void main(String argv[]) {
 
-		if (argv.length == 5) new TImageManager(argv[0], argv[1], argv[2], 150, 125 );
-	}
+	if (argv.length == 5) new TImageManager(argv[0], argv[1], argv[2], 150, 125 );
+}
 
 }
