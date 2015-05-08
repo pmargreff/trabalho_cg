@@ -57,6 +57,10 @@ public TriangulatedImage getNext(int index) {
 	return tImages.get( (index + 1) % this.size );		// walk thru array of timgs circularly
 }
 
+public TriangulatedImage get(int index) {
+	if (index >= 0 && index <= this.size) return tImages.get(index);
+}
+
 private TriangulatedImage createTImage(String imgName) {
 
 	Image loadedImage = new javax.swing.ImageIcon(imgName).getImage();
@@ -67,6 +71,8 @@ private TriangulatedImage createTImage(String imgName) {
 	Graphics2D img_loader = tmp.bi.createGraphics();
 	img_loader.transform(normalizedCoords(imageHeight));  // coloca as imagens em sua coordenada correta;
 	img_loader.drawImage(loadedImage, 0,0,null);		  // Desenha na imagem bufferizada a imagem carregada	
+
+	System.out.println(imgName);
 
 	return tmp;
 }
@@ -99,7 +105,7 @@ private void buildTImageList() {
 
 				this.tImages.add(createTImage(image_name + "." + fextension));						
 
-				//System.out.println("inserido: " + this.tImages.size());			
+				System.out.println("inserido: " + this.tImages.size());			
 
 				this.custom_points = new ArrayList<Point2D>(); 
 
@@ -127,8 +133,8 @@ private void buildTImageList() {
 								continuation++;
 							}
 
-							//System.out.println("ALL POINTS\n_____________________________________________\n");
-							//for (int i = 0; i < total_size; i++) System.out.println(current_img.tPoints[i]);
+							System.out.println("ALL POINTS\n_____________________________________________\n");
+							for (int i = 0; i < total_size; i++) System.out.println(current_img.tPoints[i]);
 
 							current_img.triangles = new int[22][3];		// nao sei se eh n_points : nao entendi isso aqui
 							
@@ -138,13 +144,12 @@ private void buildTImageList() {
 								current_img.triangles[j][2] = mapped_triangles[j][2];
 							}
 
-							/* Debugg
 							System.out.println("\n\nALL MAPPED TRIANGLES \n\n__________________________________");
 							for (int j = 0; j < 22; j++) {
 								System.out.format("Mapped[%d][0] = %d\n", j, current_img.triangles[j][0]);
 								System.out.format("Mapped[%d][1] = %d\n", j, current_img.triangles[j][1]);
 								System.out.format("Mapped[%d][2] = %d\n", j, current_img.triangles[j][2]);
-							}*/
+							}
 
 						}
 
@@ -157,7 +162,9 @@ private void buildTImageList() {
 					custom_points.add( new Point2D.Double(Integer.parseInt(inPoints[0]), Integer.parseInt(inPoints[1])) );			// acho que ta faltando cuidar as dimensoes
 				}
 
-			} else if(line.matches("<mapped>")) {							while((line = pointFile.readLine()) != null) {
+			} else if(line.matches("<mapped>")) {							
+				int p_line = 0;
+				while((line = pointFile.readLine()) != null) {
 					if (line.matches("</mapped>")) break;
 					
 					String mPoints[] = line.split(" ");
