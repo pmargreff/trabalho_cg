@@ -1,13 +1,6 @@
 /*
-
-	TODO: [ Importante ] Implementar uma estrutura otimizada para utilizar as imagens trianguladas e carregar as informacoes dos pontos de
-		  triangulacao;
-
-	TODO: Resolver a questao do numero de imagens e da aplicacao do delay [Importante]
-
-	TODO: Implementar logica de voltar/selecionar as imagens durante a tragetoria para o caso onde ha mais semi-circulos que
-		  imagens;
-	
+	TODO: Nao sei por que, mas o programa custa a terminar. Creio que seja pelo problema do delay;
+	TODO: 1. Resolver a questao do numero de imagens e da aplicacao do delay [Importante]
 	TODO: Se der tempo, tentar centralizar a imagem do fundo e ver se eh possivel trabalhar com png para tirar o fundo da imagem;		
 
 	Docs:

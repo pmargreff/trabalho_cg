@@ -263,8 +263,7 @@ public class TriangulatedImage
           }
           yInt = (int) Math.round(aux);
 
-          //System.out.format("x: %d -- y: %d\n", xInt, yInt);
-
+          // [BUG] Tava saindo dos limites do buffered image;
           if (yInt > bi.getHeight() - 1) yInt = bi.getHeight() - 1; 
           if (xInt > bi.getWidth()  - 1) yInt = bi.getWidth() - 1; 
 
