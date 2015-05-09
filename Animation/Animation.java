@@ -15,49 +15,28 @@ import java.awt.image.BufferedImage;
 
 
 public class Animation extends TimerTask {
-  //TODO list: 
-  //corrigir erro do primeiro ponto
-  //alterar imagens para passar todas
-	//recalcular pontos
-    //The window in which everything is shown.
-	private BufferedImageDrawer buffid;
 
-  	//The background image
-	private BufferedImage bg;
 
-  	//Variáveis para cálculo do bresenham
-	private Point pi;
-	private Point pf;
-	private int jump;
-
-  	//Flag para marcar a rotação, e posteriormente a troca de imagens
-	Flag turn = new Flag(false);
-
-  	//parametros que serão recebidos
-	private int radius;     
-	private int segments;   
-	private int repetitions;
-	private int x_0;
-	private int y_0;
-
-  	//lista que conterá o trajeto  
-	private ArrayList<Point> point_list;
-
-  //The triangulated images.
-	private TriangulatedImage capitain1;
-	private TriangulatedImage capitain2;
-	private TriangulatedImage ironMan1;
-	private TriangulatedImage ironMan2;
-	private TriangulatedImage hulk1;
-	private TriangulatedImage hulk2;
-	private TriangulatedImage hulk3;
+  private int radius;     
+  private int segments;   
+  private int repetitions;
+  private int x_0;
+  private int y_0;
+  private int jump;
+  private int imageHeight;
+  private int imageWidth;
+  //The background image
+  private Point pi;
+  private Point pf;
+  private BufferedImage bg;
+  //This is used for generating/storing the intermediate images.
+  private BufferedImage mix;
+  //The window in which everything is shown.
+  private BufferedImageDrawer buffid;
+  //lista que conterá o trajeto  
+  private ArrayList<Point> point_list;
 
   //Size of images
-	private int imageWidth;
-	private int imageHeight;
-
-    //This is used for generating/storing the intermediate images.
-	private BufferedImage mix;
 
 	private double alpha;
 	private double deltaAlpha;
@@ -224,63 +203,93 @@ public AffineTransform normalizedCoords(int height) {
 
 }
 
+/*
+   Acho que cada vez que o run for chamado ele tem que calcular um segmento.
+   Portanto, o estado do calculo deve ser mantido e o proximo estado calculado no final;
+   Talvez, como usamos shifts para o calculo da animaçao, isso seja um problema. Pensar em uma alternativa, ou
+   cirar um vetorzao com os pontos do bresenham;
+   PS: 
+      (1) O metodo mixWith() ja calcula a interpolacao entre as duas imagens bufferizadas (ver  MorphingCandS.java);
+      (2) O alfa talvez tenha que depender do delay;
+*/
 public void run() {
+  
+  if (repetitions > 0) {
+      repetitions--;
 
-  	if (repetitions > 0) {
-  		repetitions--;
-
-  		int shift = repetition_controller * radius * 2;
-
-		Point initialPoint = new Point();
-		initialPoint.set_x(pi.get_x() + shift);
-		initialPoint.set_y(pi.get_y());
-
-  		for (int j = 0; j < segments; j++) {
-
-  			calculateInterpolationPoints(pf, j, shift);
-  			Point interpolatedPoint = new Point();
-  			
-  			for (double step = 0; step < 70; step++ ) {
-  				if (alpha >= 0 && alpha <= 1) {
-  					int castAux = (int) ((1 - alpha) * initialPoint.get_x() + alpha * pf.get_x());
-  					interpolatedPoint.set_x(castAux);
-  					
-  					castAux = (int) ((1 - alpha) * initialPoint.get_y() + alpha * pf.get_y());
-  					interpolatedPoint.set_y(castAux);
-  				    
-  				    /* Calcula a interpolacao entre a imagem atual e a proxima (fechando, assim, um segmento), 
-  				    respeitando o numero de imagens que existem para interpolar por meio do 
-  				    */ 
-
-  					//mix = capitain1.mixWith(capitain2,alpha);
-  					mix = currentImage.mixWith(tImages.getNext(j), alpha);
-
-  				    //Draw the interpolated image on the BufferedImage.
-  					//buffid.g2dbi.drawImage(bg,0,0,null);
-  					buffid.g2dbi.drawImage(mix,interpolatedPoint.get_x(),interpolatedPoint.get_y(),null);
-  				}
-  				
-  				buffid.repaint();
-  				alpha = alpha+deltaAlpha;
-  			}
-
-  			currentImage = tImages.getNext(j);	// faz a ultima anterior virar a primeira.
-
-  			initialPoint.set_x(pf.get_x());
-  			initialPoint.set_y(pf.get_y());
-
-  			alpha = 0;
-  		}
-
-  		repetition_controller++;
-
-
-  	} else {
-  		// Termina a excecucao quando chega no numero maximo de repeticoes;
-  		this.cancel();
-  	}
+  } else {
+    this.cancel();
+  }
 
 }
+
+
+/*
+  150 * 125 * 8 * 70 * 20 = 210000000 (200MB)
+
+  Esse run() ta errado. Precisa ser calculado utilizando o delay, e a 
+  classe TriangulatedImage ja calcula a interpolaçao convexao;
+
+*/
+
+
+// public void run() {
+
+//   	if (repetitions > 0) {
+//   		repetitions--;
+
+//   		int shift = repetition_controller * radius * 2;
+
+// 		Point initialPoint = new Point();
+// 		initialPoint.set_x(pi.get_x() + shift);
+// 		initialPoint.set_y(pi.get_y());
+
+//   		for (int j = 0; j < segments; j++) {
+
+//   			calculateInterpolationPoints(pf, j, shift);
+//   			Point interpolatedPoint = new Point();
+  			
+//   			for (double step = 0; step < 70; step++ ) {
+//   				if (alpha >= 0 && alpha <= 1) {
+//   					int castAux = (int) ((1 - alpha) * initialPoint.get_x() + alpha * pf.get_x());
+//   					interpolatedPoint.set_x(castAux);
+  					
+//   					castAux = (int) ((1 - alpha) * initialPoint.get_y() + alpha * pf.get_y());
+//   					interpolatedPoint.set_y(castAux);
+  				    
+//   				     Calcula a interpolacao entre a imagem atual e a proxima (fechando, assim, um segmento), 
+//   				    respeitando o numero de imagens que existem para interpolar por meio do 
+  				     
+
+//   					//mix = capitain1.mixWith(capitain2,alpha);
+//   					mix = currentImage.mixWith(tImages.getNext(j), alpha);
+
+//   				    //Draw the interpolated image on the BufferedImage.
+//   					//buffid.g2dbi.drawImage(bg,0,0,null);
+//   					buffid.g2dbi.drawImage(mix,interpolatedPoint.get_x(),interpolatedPoint.get_y(),null);
+//   				}
+  				
+//   				buffid.repaint();
+//   				alpha = alpha+deltaAlpha;
+//   			}
+
+//   			currentImage = tImages.getNext(j);	// faz a ultima anterior virar a primeira.
+
+//   			initialPoint.set_x(pf.get_x());
+//   			initialPoint.set_y(pf.get_y());
+
+//   			alpha = 0;
+//   		}
+
+//   		repetition_controller++;
+
+
+//   	} else {
+//   		// Termina a excecucao quando chega no numero maximo de repeticoes;
+//   		this.cancel();
+//   	}
+
+// }
 
   //o main tem que ficar aqui, 
   //não vai rodar em arquivo próprio por conflito na classe TaskTimer
