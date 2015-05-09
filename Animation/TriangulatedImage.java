@@ -248,8 +248,6 @@ public class TriangulatedImage
           rgbValueThis = this.bi.getRGB(xInt,yInt);
           thisColour = new Color(rgbValueThis);
 
-
-
           //Do the same as above for the second image ti.
           aux = 0;
           for (int k=0; k<3; k++)
@@ -264,6 +262,11 @@ public class TriangulatedImage
             aux = aux + t[k]*ti.tPoints[ti.triangles[tNo][k]].getY();
           }
           yInt = (int) Math.round(aux);
+
+          //System.out.format("x: %d -- y: %d\n", xInt, yInt);
+
+          if (yInt > bi.getHeight() - 1) yInt = bi.getHeight() - 1; 
+          if (xInt > bi.getWidth()  - 1) yInt = bi.getWidth() - 1; 
 
           rgbValueTi = ti.bi.getRGB(xInt,yInt);
           tiColour = new Color(rgbValueTi);
