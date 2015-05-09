@@ -19,6 +19,9 @@ public class TriangulatedImage
   //The initial image.
   BufferedImage bi;
 
+  // needed to draw on bi
+  public Graphics2D g2dbi;
+
   //The points needed for the triangulation. 
   Point2D[] tPoints;
 

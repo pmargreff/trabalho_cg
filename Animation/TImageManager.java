@@ -58,10 +58,10 @@ public TriangulatedImage getNext(int index) {
 }
 
 public TriangulatedImage get(int index) {
+		
 	if (index >= 0 && index <= this.size) {
 		return tImages.get(index);
 	}
-
 	return null;
 }
 
@@ -71,13 +71,12 @@ private TriangulatedImage createTImage(String imgName) {
 
 	TriangulatedImage tmp = new TriangulatedImage();
 	tmp.bi = new BufferedImage(imageWidth,imageHeight, BufferedImage.TYPE_INT_RGB);
+	tmp.g2dbi = tmp.bi.createGraphics();
+	tmp.g2dbi.transform(normalizedCoords(imageHeight));  // coloca as imagens em sua coordenada correta;
+	tmp.g2dbi.drawImage(loadedImage, 0,0,null);		  // Desenha na imagem bufferizada a imagem carregada	
 
-	Graphics2D img_loader = tmp.bi.createGraphics();
-	img_loader.transform(normalizedCoords(imageHeight));  // coloca as imagens em sua coordenada correta;
-	img_loader.drawImage(loadedImage, 0,0,null);		  // Desenha na imagem bufferizada a imagem carregada	
+	return(tmp);
 
-
-	return tmp;
 }
 
 private void buildTImageList() {
@@ -105,7 +104,13 @@ private void buildTImageList() {
 
 				String image_name = line.substring(1, line.length() - 1);
 
-				this.tImages.add(createTImage(image_name + "." + fextension));						
+				/*
+					TODO:
+					Como nao adicionada o path, dava problema. Aqui deveria ser feito verificacoes
+					acerca das validades do path, do nome e caso exista "." ou "/" nos nomes;
+				*/
+
+				this.tImages.add( createTImage( dir_path + image_name + "." + fextension) );						
 
 				this.custom_points = new ArrayList<Point2D>(); 
 
@@ -193,10 +198,16 @@ public int getSize() {
 	return this.size;
 }
 
-
+/*
 public static void main(String argv[]) {
 
-	if (argv.length == 5) new TImageManager(argv[0], argv[1], argv[2], 150, 125 );
-}
+	if (argv.length == 5) {
+
+		TImageManager ti = new TImageManager(argv[0], argv[1], argv[2], 150, 125 );
+		
+		BufferedImageDrawer imgd = new BufferedImageDrawer(ti.getNext(1).bi, 150,125);	
+
+	}
+}*/
 
 }

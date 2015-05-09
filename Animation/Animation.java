@@ -71,6 +71,11 @@ public class Animation extends TimerTask {
 	private int steps;
   // Image loadedImage;
 
+	private TImageManager tImages;
+
+	private TriangulatedImage currentImage;
+	private TriangulatedImage nextImage;
+
 	private int repetition_controller;
 
   /**
@@ -113,7 +118,10 @@ public class Animation extends TimerTask {
   	imageWidth = 150;
   	imageHeight = 125;
 
-  	calculateTriangles(imageWidth, imageHeight);
+  	//calculateTriangles(imageWidth, imageHeight);
+  	this.tImages = new TImageManager("data/","data/point_info" ,"jpg" , 150, 125 );
+
+	currentImage = tImages.get(0);
 
   	steps = 70;
   	deltaAlpha = 1.0/steps;
@@ -237,7 +245,6 @@ public void run() {
   		for (int j = 0; j < segments; j++) {
 
   			calculateInterpolationPoints(pf, j, shift);
-
   			Point interpolatedPoint = new Point();
   			
   			for (double step = 0; step < 70; step++ ) {
@@ -252,7 +259,8 @@ public void run() {
   				    respeitando o numero de imagens que existem para interpolar por meio do 
   				    */ 
 
-  					mix = capitain1.mixWith(capitain2,alpha);	
+  					//mix = capitain1.mixWith(capitain2,alpha);
+  					mix = currentImage.mixWith(tImages.getNext(j), alpha);
 
   				    //Draw the interpolated image on the BufferedImage.
   					//buffid.g2dbi.drawImage(bg,0,0,null);
@@ -262,6 +270,8 @@ public void run() {
   				buffid.repaint();
   				alpha = alpha+deltaAlpha;
   			}
+
+  			currentImage = tImages.getNext(j);	// faz a ultima anterior virar a primeira.
 
   			initialPoint.set_x(pf.get_x());
   			initialPoint.set_y(pf.get_y());
@@ -279,420 +289,6 @@ public void run() {
 
 }
 
-private void calculateTriangles(int imageWidth, int imageHeight){
-	Image loadedImage;
-
-	  //Define primeiro pontos ancoras das bordas
-	  //depois os pontos do rosto
-
-		//Carrega Steve Rogers
-		//-----------------------------------------------------------------------------------------
-	capitain1 = new TriangulatedImage();
-	capitain1.bi = new BufferedImage(imageWidth,imageHeight,BufferedImage.TYPE_INT_RGB);
-
-	Graphics2D g2dcapitain1 = capitain1.bi.createGraphics();
-
-	  //Load the image and draw it on the corresponding BufferedImage.
-	loadedImage = new javax.swing.ImageIcon("capitain1.jpg").getImage();
-
-	//g2dcapitain1.transform(normalizedCoords(imageHeight));	// para corrigir as imagens que ficaram de cabeca para baixo;
-
-	AffineTransform tr = new AffineTransform();
-	tr.setToTranslation(pi.get_x(), pi.get_y());
-
-	g2dcapitain1.transform(tr);
-
-	g2dcapitain1.drawImage(loadedImage, 0,0,null);
-
-	capitain1.tPoints = new Point2D[17];
-
-	//ancoras
-	capitain1.tPoints[0] = new Point2D.Double(150 - 0,125 -0);
-	capitain1.tPoints[1] = new Point2D.Double(150 - 150,125 -0);
-	capitain1.tPoints[2] = new Point2D.Double(150 - 0,125 -40);
-	capitain1.tPoints[3] = new Point2D.Double(150 - 150,125 -40);
-	capitain1.tPoints[4] = new Point2D.Double(150 - 0,125 -70);
-	capitain1.tPoints[5] = new Point2D.Double(150 - 150,125 -70);
-	capitain1.tPoints[6] = new Point2D.Double(150 - 0,125 -125);
-	capitain1.tPoints[7] = new Point2D.Double(150 - 150,125 -125);
-	capitain1.tPoints[8] = new Point2D.Double(150 - 45,125 -125);
-	capitain1.tPoints[9] = new Point2D.Double(150 - 110,125 -125);
-
-	  //pontos do rosto
-	capitain1.tPoints[10] = new Point2D.Double(150 - 75,125 -2);
-	capitain1.tPoints[11] = new Point2D.Double(150 - 65,125 -50);
-	capitain1.tPoints[12] = new Point2D.Double(150 - 80,125 -50);
-	capitain1.tPoints[13] = new Point2D.Double(150 - 75,125 -70);
-	capitain1.tPoints[14] = new Point2D.Double(150 - 75,125 -85);
-	capitain1.tPoints[15] = new Point2D.Double(150 - 20,125 -95);
-	capitain1.tPoints[16] = new Point2D.Double(150 - 125,125 -95);
-
-	//Definition of the triangles.
-	capitain1.triangles = new int[22][3];
-
-	capitain1.triangles[0][0] = 0;
-	capitain1.triangles[0][1] = 10;
-	capitain1.triangles[0][2] = 1;
-
-	capitain1.triangles[1][0] = 0;
-	capitain1.triangles[1][1] = 2;
-	capitain1.triangles[1][2] = 10;
-
-	capitain1.triangles[2][0] = 10;
-	capitain1.triangles[2][1] = 1;
-	capitain1.triangles[2][2] = 3;
-
-	capitain1.triangles[3][0] = 2;
-	capitain1.triangles[3][1] = 10;
-	capitain1.triangles[3][2] = 11;
-
-	capitain1.triangles[4][0] = 10;
-	capitain1.triangles[4][1] = 11;
-	capitain1.triangles[4][2] = 12;
-
-	capitain1.triangles[5][0] = 10;
-	capitain1.triangles[5][1] = 12;
-	capitain1.triangles[5][2] = 3;
-
-	capitain1.triangles[6][0] = 2;
-	capitain1.triangles[6][1] = 11;
-	capitain1.triangles[6][2] = 4;
-
-	capitain1.triangles[7][0] = 4;
-	capitain1.triangles[7][1] = 11;
-	capitain1.triangles[7][2] = 13;
-
-	capitain1.triangles[8][0] = 11;
-	capitain1.triangles[8][1] = 12;
-	capitain1.triangles[8][2] = 13;
-
-	capitain1.triangles[9][0] = 12;
-	capitain1.triangles[9][1] = 13;
-	capitain1.triangles[9][2] = 5;
-
-	capitain1.triangles[10][0] = 12;
-	capitain1.triangles[10][1] = 3;
-	capitain1.triangles[10][2] = 5;
-
-	capitain1.triangles[11][0] = 4;
-	capitain1.triangles[11][1] = 6;
-	capitain1.triangles[11][2] = 15;
-
-	capitain1.triangles[12][0] = 15;
-	capitain1.triangles[12][1] = 4;
-	capitain1.triangles[12][2] = 13;
-
-	capitain1.triangles[13][0] = 13;
-	capitain1.triangles[13][1] = 14;
-	capitain1.triangles[13][2] = 15;
-
-	capitain1.triangles[14][0] = 13;
-	capitain1.triangles[14][1] = 14;
-	capitain1.triangles[14][2] = 16;
-
-	capitain1.triangles[15][0] = 13;
-	capitain1.triangles[15][1] = 5;
-	capitain1.triangles[15][2] = 16;
-
-	capitain1.triangles[16][0] = 16;
-	capitain1.triangles[16][1] = 5;
-	capitain1.triangles[16][2] = 7;
-
-	capitain1.triangles[17][0] = 6;
-	capitain1.triangles[17][1] = 15;
-	capitain1.triangles[17][2] = 8;
-
-	capitain1.triangles[18][0] = 15;
-	capitain1.triangles[18][1] = 14;
-	capitain1.triangles[18][2] = 8;
-
-	capitain1.triangles[19][0] = 8;
-	capitain1.triangles[19][1] = 9;
-	capitain1.triangles[19][2] = 14;
-
-	capitain1.triangles[20][0] = 14;
-	capitain1.triangles[20][1] = 16;
-	capitain1.triangles[20][2] = 9;
-
-	capitain1.triangles[21][0] = 16;
-	capitain1.triangles[21][1] = 7;
-	capitain1.triangles[21][2] = 9;
-
-			//Carrega Capitão América
-			//-----------------------------------------------------------------------------------------
-	capitain2 = new TriangulatedImage();
-
-	capitain2.bi = new BufferedImage(imageWidth,imageHeight,BufferedImage.TYPE_INT_RGB);
-	Graphics2D g2dcapitain2 = capitain2.bi.createGraphics();
-
-	loadedImage = new javax.swing.ImageIcon("capitain2.jpg").getImage();
-
-	g2dcapitain2.transform(tr);
-
-	g2dcapitain2.drawImage(loadedImage, 0,0,null);
-
-	capitain2.tPoints = new Point2D[17];
-
-		  //ancoras
-	capitain2.tPoints[0] = new Point2D.Double(150 - 0,125 -0);
-	capitain2.tPoints[1] = new Point2D.Double(150 - 150,125 -0);
-	capitain2.tPoints[2] = new Point2D.Double(150 - 0,125 -40);
-	capitain2.tPoints[3] = new Point2D.Double(150 - 150,125 -40);
-	capitain2.tPoints[4] = new Point2D.Double(150 - 0,125 -70);
-	capitain2.tPoints[5] = new Point2D.Double(150 - 150,125 -70);
-	capitain2.tPoints[6] = new Point2D.Double(150 - 0,125 -125);
-	capitain2.tPoints[7] = new Point2D.Double(150 - 150,125 -125);
-	capitain2.tPoints[8] = new Point2D.Double(150 - 45,125 -125);
-	capitain2.tPoints[9] = new Point2D.Double(150 - 110,125 -125);
-
-		  //pontos do rosto
-	capitain2.tPoints[10] = new Point2D.Double(150 - 65,125 -10);
-	capitain2.tPoints[11] = new Point2D.Double(150 - 55,125 -45);
-	capitain2.tPoints[12] = new Point2D.Double(150 - 72,125 -45);
-	capitain2.tPoints[13] = new Point2D.Double(150 - 62,125 -62);
-	capitain2.tPoints[14] = new Point2D.Double(150 - 75,125 -85);
-	capitain2.tPoints[15] = new Point2D.Double(150 - 20,125 -96);
-	capitain2.tPoints[16] = new Point2D.Double(150 - 115,125 -90);
-
-		  //Definition of the triangles.
-	capitain2.triangles = new int[22][3];
-
-	for (int i = 0 ;i < 22 ; i++ ) {
-
-		capitain2.triangles[i][0] = capitain1.triangles[i][0];
-		capitain2.triangles[i][1] = capitain1.triangles[i][1];
-		capitain2.triangles[i][2] = capitain1.triangles[i][2];
-
-	}
-
-			  	//Carrega Tony Stark
-			  	//-----------------------------------------------------------------------------------------
-	ironMan1 = new TriangulatedImage();
-	ironMan1.bi = new BufferedImage(imageWidth,imageHeight,BufferedImage.TYPE_INT_RGB);
-
-	Graphics2D g2dironMan1 = ironMan1.bi.createGraphics();
-
-			    //Load the image and draw it on the corresponding BufferedImage.
-	loadedImage = new javax.swing.ImageIcon("ironMan1.jpg").getImage();
-	g2dironMan1.drawImage(loadedImage, 0,0,null);
-
-	ironMan1.tPoints = new Point2D[17];
-
-			    //ancoras
-	ironMan1.tPoints[0] = new Point2D.Double(150 - 0,0);
-	ironMan1.tPoints[1] = new Point2D.Double(150 - 150,0);
-	ironMan1.tPoints[2] = new Point2D.Double(150 - 0,40);
-	ironMan1.tPoints[3] = new Point2D.Double(150 - 150,40);
-	ironMan1.tPoints[4] = new Point2D.Double(150 - 0,70);
-	ironMan1.tPoints[5] = new Point2D.Double(150 - 150,70);
-	ironMan1.tPoints[6] = new Point2D.Double(150 - 0,125);
-	ironMan1.tPoints[7] = new Point2D.Double(150 - 150,125);
-	ironMan1.tPoints[8] = new Point2D.Double(150 - 45,125);
-	ironMan1.tPoints[9] = new Point2D.Double(150 - 110,125);
-
-			    //pontos do rosto
-	ironMan1.tPoints[10] = new Point2D.Double(150 - 75,15);
-	ironMan1.tPoints[11] = new Point2D.Double(150 - 65,35);
-	ironMan1.tPoints[12] = new Point2D.Double(150 - 85,35);
-	ironMan1.tPoints[13] = new Point2D.Double(150 - 75,50);
-	ironMan1.tPoints[14] = new Point2D.Double(150 - 72,65);
-	ironMan1.tPoints[15] = new Point2D.Double(150 - 40,80);
-	ironMan1.tPoints[16] = new Point2D.Double(150 - 110,85);
-
-			    //Definition of the triangles.
-	ironMan1.triangles = new int[22][3];
-
-	for (int i = 0 ;i < 22 ; i++ ) {
-
-		ironMan1.triangles[i][0] = capitain1.triangles[i][0];
-		ironMan1.triangles[i][1] = capitain1.triangles[i][1];
-		ironMan1.triangles[i][2] = capitain1.triangles[i][2];
-
-	}
-
-
-			  	//Carrega Homem de ferro
-			  	//-----------------------------------------------------------------------------------------
-	ironMan2 = new TriangulatedImage();
-	ironMan2.bi = new BufferedImage(imageWidth,imageHeight,BufferedImage.TYPE_INT_RGB);
-
-	Graphics2D g2dironMan2 = ironMan2.bi.createGraphics();
-
-			    //Load the image and draw it on the corresponding BufferedImage.
-	loadedImage = new javax.swing.ImageIcon("ironMan2.jpg").getImage();
-	g2dironMan2.drawImage(loadedImage, 0,0,null);
-
-	ironMan2.tPoints = new Point2D[17];
-
-			//ancoras
-	ironMan2.tPoints[0] = new Point2D.Double(150 - 0,0);
-	ironMan2.tPoints[1] = new Point2D.Double(150 - 150,0);
-	ironMan2.tPoints[2] = new Point2D.Double(150 - 0,40);
-	ironMan2.tPoints[3] = new Point2D.Double(150 - 150,40);
-	ironMan2.tPoints[4] = new Point2D.Double(150 - 0,70);
-	ironMan2.tPoints[5] = new Point2D.Double(150 - 150,70);
-	ironMan2.tPoints[6] = new Point2D.Double(150 - 0,125);
-	ironMan2.tPoints[7] = new Point2D.Double(150 - 150,125);
-	ironMan2.tPoints[8] = new Point2D.Double(150 - 45,125);
-	ironMan2.tPoints[9] = new Point2D.Double(150 - 110,125);
-
-			    //pontos do rosto
-	ironMan2.tPoints[10] = new Point2D.Double(150 - 95,20);
-	ironMan2.tPoints[11] = new Point2D.Double(150 - 85,40);
-	ironMan2.tPoints[12] = new Point2D.Double(150 - 100,40);
-	ironMan2.tPoints[13] = new Point2D.Double(150 - 90,60);
-	ironMan2.tPoints[14] = new Point2D.Double(150 - 90,75);
-	ironMan2.tPoints[15] = new Point2D.Double(150 - 25,70);
-	ironMan2.tPoints[16] = new Point2D.Double(150 - 125,90);
-
-			    //Definition of the triangles.
-	ironMan2.triangles = new int[22][3];
-
-	for (int i = 0 ;i < 22 ; i++ ) {
-
-		ironMan2.triangles[i][0] = capitain1.triangles[i][0];
-		ironMan2.triangles[i][1] = capitain1.triangles[i][1];
-		ironMan2.triangles[i][2] = capitain1.triangles[i][2];
-
-	}
-
-			  	//Carrega Bruce Banne
-			  	//-----------------------------------------------------------------------------------------
-	hulk1 = new TriangulatedImage();
-	hulk1.bi = new BufferedImage(imageWidth,imageHeight,BufferedImage.TYPE_INT_RGB);
-
-	Graphics2D g2dhulk1 = hulk1.bi.createGraphics();
-
-			    //Load the image and draw it on the corresponding BufferedImage.
-	loadedImage = new javax.swing.ImageIcon("hulk1.jpg").getImage();
-	g2dhulk1.drawImage(loadedImage, 0,0,null);
-
-	hulk1.tPoints = new Point2D[17];
-
-			    //ancoras
-	hulk1.tPoints[0] = new Point2D.Double(150 - 0,0);
-	hulk1.tPoints[1] = new Point2D.Double(150 - 150,0);
-	hulk1.tPoints[2] = new Point2D.Double(150 - 0,40);
-	hulk1.tPoints[3] = new Point2D.Double(150 - 150,40);
-	hulk1.tPoints[4] = new Point2D.Double(150 - 0,70);
-	hulk1.tPoints[5] = new Point2D.Double(150 - 150,70);
-	hulk1.tPoints[6] = new Point2D.Double(150 - 0,125);
-	hulk1.tPoints[7] = new Point2D.Double(150 - 150,125);
-	hulk1.tPoints[8] = new Point2D.Double(150 - 45,125);
-	hulk1.tPoints[9] = new Point2D.Double(150 - 110,125);
-
-			    //pontos do rosto
-	hulk1.tPoints[10] = new Point2D.Double(150 - 70,10);
-	hulk1.tPoints[11] = new Point2D.Double(150 - 60,45);
-	hulk1.tPoints[12] = new Point2D.Double(150 - 80,50);
-	hulk1.tPoints[13] = new Point2D.Double(150 - 75,60);
-	hulk1.tPoints[14] = new Point2D.Double(150 - 70,80);
-	hulk1.tPoints[15] = new Point2D.Double(150 - 25,100);
-	hulk1.tPoints[16] = new Point2D.Double(150 - 125,95);
-
-			    //Definition of the triangles.
-	hulk1.triangles = new int[22][3];
-
-	for (int i = 0 ;i < 22 ; i++ ) {
-
-		hulk1.triangles[i][0] = capitain1.triangles[i][0];
-		hulk1.triangles[i][1] = capitain1.triangles[i][1];
-		hulk1.triangles[i][2] = capitain1.triangles[i][2];
-
-	}
-
-			  	//Carrega Hulk - Monstro
-			  	//-----------------------------------------------------------------------------------------
-	hulk2 = new TriangulatedImage();
-	hulk2.bi = new BufferedImage(imageWidth,imageHeight,BufferedImage.TYPE_INT_RGB);
-
-	Graphics2D g2dhulk2 = hulk2.bi.createGraphics();
-
-			    //Load the image and draw it on the corresponding BufferedImage.
-	loadedImage = new javax.swing.ImageIcon("hulk2.jpg").getImage();
-	g2dhulk2.drawImage(loadedImage, 0,0,null);
-
-	hulk2.tPoints = new Point2D[17];
-
-			    //ancoras
-	hulk2.tPoints[0] = new Point2D.Double(150 - 0,0);
-	hulk2.tPoints[1] = new Point2D.Double(150 - 150,0);
-	hulk2.tPoints[2] = new Point2D.Double(150 - 0,40);
-	hulk2.tPoints[3] = new Point2D.Double(150 - 150,40);
-	hulk2.tPoints[4] = new Point2D.Double(150 - 0,70);
-	hulk2.tPoints[5] = new Point2D.Double(150 - 150,70);
-	hulk2.tPoints[6] = new Point2D.Double(150 - 0,125);
-	hulk2.tPoints[7] = new Point2D.Double(150 - 150,125);
-	hulk2.tPoints[8] = new Point2D.Double(150 - 45,125);
-	hulk2.tPoints[9] = new Point2D.Double(150 - 110,125);
-
-			    //pontos do rosto
-	hulk2.tPoints[10] = new Point2D.Double(150 - 75,10);
-	hulk2.tPoints[11] = new Point2D.Double(150 - 65,80);
-	hulk2.tPoints[12] = new Point2D.Double(150 - 90, 80);
-	hulk2.tPoints[13] = new Point2D.Double(150 - 80,95);
-	hulk2.tPoints[14] = new Point2D.Double(150 - 80,120);
-	hulk2.tPoints[15] = new Point2D.Double(150 - 25,85);
-	hulk2.tPoints[16] = new Point2D.Double(150 - 120,90);
-
-			    //Definition of the triangles.
-	hulk2.triangles = new int[22][3];
-
-	for (int i = 0 ;i < 22 ; i++ ) {
-
-		hulk2.triangles[i][0] = capitain1.triangles[i][0];
-		hulk2.triangles[i][1] = capitain1.triangles[i][1];
-		hulk2.triangles[i][2] = capitain1.triangles[i][2];
-
-	}
-
-
-			  	//Carrega Hulk - Monstro
-			  	//-----------------------------------------------------------------------------------------
-	hulk3 = new TriangulatedImage();
-	hulk3.bi = new BufferedImage(imageWidth,imageHeight,BufferedImage.TYPE_INT_RGB);
-
-	Graphics2D g2dhulk3 = hulk3.bi.createGraphics();
-
-			    //Load the image and draw it on the corresponding BufferedImage.
-	loadedImage = new javax.swing.ImageIcon("hulk3.jpg").getImage();
-	g2dhulk3.drawImage(loadedImage, 0,0,null);
-
-	hulk3.tPoints = new Point2D[17];
-
-			    //ancoras
-	hulk3.tPoints[0] = new Point2D.Double(150 - 0,0);
-	hulk3.tPoints[1] = new Point2D.Double(150 - 150,0);
-	hulk3.tPoints[2] = new Point2D.Double(150 - 0,40);
-	hulk3.tPoints[3] = new Point2D.Double(150 - 150,40);
-	hulk3.tPoints[4] = new Point2D.Double(150 - 0,70);
-	hulk3.tPoints[5] = new Point2D.Double(150 - 150,70);
-	hulk3.tPoints[6] = new Point2D.Double(150 - 0,125);
-	hulk3.tPoints[7] = new Point2D.Double(150 - 150,125);
-	hulk3.tPoints[8] = new Point2D.Double(150 - 45,125);
-	hulk3.tPoints[9] = new Point2D.Double(150 - 110,125);
-
-			    //pontos do rosto
-	hulk3.tPoints[10] = new Point2D.Double(150 - 70,15);
-	hulk3.tPoints[11] = new Point2D.Double(150 - 60,50);
-	hulk3.tPoints[12] = new Point2D.Double(150 - 80, 50);
-	hulk3.tPoints[13] = new Point2D.Double(150 - 70,60);
-	hulk3.tPoints[14] = new Point2D.Double(150 - 70,80);
-	hulk3.tPoints[15] = new Point2D.Double(150 - 30,95);
-	hulk3.tPoints[16] = new Point2D.Double(150 - 120,95);
-
-			    //Definition of the triangles.
-	hulk3.triangles = new int[22][3];
-
-	for (int i = 0 ;i < 22 ; i++ ) {
-
-		hulk3.triangles[i][0] = capitain1.triangles[i][0];
-		hulk3.triangles[i][1] = capitain1.triangles[i][1];
-		hulk3.triangles[i][2] = capitain1.triangles[i][2];
-
-	}
-
-}
   //o main tem que ficar aqui, 
   //não vai rodar em arquivo próprio por conflito na classe TaskTimer
   //contador_de_horas_tentando_deixar_o_main_em_um_arquivo_separado: +-8 horas
