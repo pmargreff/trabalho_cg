@@ -44,12 +44,13 @@ public class Animation extends TimerTask {
   private TriangulatedImage current_image;
 
 
+
   /**
   * Constructor
   * @param bid          The buffered image to be drawn
   * @param backGround   The background (buffered) image
   */
-public Animation(int r, int s, int n, int x, int y, int h, BufferedImageDrawer b, BufferedImage bg) {
+public Animation(int r, int s, int n, int x, int y, int h, BufferedImageDrawer b, BufferedImage bg, TImageData t) {
 
   	this.radius        = r;
   	this.repetitions   = n;
@@ -61,6 +62,7 @@ public Animation(int r, int s, int n, int x, int y, int h, BufferedImageDrawer b
     this.alpha         = 0;
     this.delta_alpha   = 1f/100f;     //mudar dps
     this.repetition_controller = 0;
+
 
     this.bid = b;
     this.background = bg;
@@ -77,7 +79,7 @@ public Animation(int r, int s, int n, int x, int y, int h, BufferedImageDrawer b
     pi.set_x(point_list.get(0).get_x());
     pi.set_y(point_list.get(0).get_y()); 
 
-    this.tImages = new TImageManager("data/","data/point_info" ,"jpg" , 150, 125 );  
+    this.tImages = new TImageManager(t.path,t.conf_file ,t.extension , t.imageWidth, t.imageHeight );  
 
     this.current_image = this.tImages.get(0);
   	
@@ -246,13 +248,18 @@ public static AffineTransform normalizedCoords(int height) {
   //não vai rodar em arquivo próprio por conflito na classe TaskTimer
   //contador_de_horas_tentando_deixar_o_main_em_um_arquivo_separado: +-8 horas
 public static void main(String[] argv) {
-	if ( argv.length == 5 ) {
+	if ( argv.length == 8 ) {
 
 		int radius    	= Integer.parseInt(argv[0]);
 		int segments  	= Integer.parseInt(argv[1]);
 		int repetitions = Integer.parseInt(argv[2]);
 		int x_center  	= Integer.parseInt(argv[3]);
 		int y_center  	= Integer.parseInt(argv[4]);
+		String path     = argv[5];
+
+		int delay 		= Integer.parseInt(argv[7]);
+		String conff    = argv[6];
+		
 
 		int width  = radius * 2 * repetitions + 150 + x_center;
 		int height = radius + y_center + 150;
@@ -265,7 +272,6 @@ public static void main(String[] argv) {
 
 
     //Specifies (in milliseconds) when the quad should be updated.
-		int delay = 200;
 
     //The BufferedImage to be drawn in the window.
 
@@ -276,7 +282,7 @@ public static void main(String[] argv) {
 		g2dBackGround.setStroke(new BasicStroke(2.0f));
 	    //The background is painted white first.
 		g2dBackGround.setPaint(Color.white);
-		
+
 		g2dBackGround.transform(Animation.normalizedCoords(height));
 
 		g2dBackGround.fill(new Rectangle(0,0,width,height));
@@ -289,7 +295,7 @@ public static void main(String[] argv) {
 	    //The window in which everything is drawn.
 		BufferedImageDrawer bid = new BufferedImageDrawer(bi,width,height);
 
-	    Animation scene = new Animation(radius, segments, repetitions, x_center, y_center,height, bid, backGround);
+	    Animation scene = new Animation(radius, segments, repetitions, x_center, y_center,height, bid, backGround, new TImageData(path, conff, "jpg", 150, 125));
 	    Timer t = new Timer();
 	  	t.scheduleAtFixedRate( scene, 0, delay);
 
