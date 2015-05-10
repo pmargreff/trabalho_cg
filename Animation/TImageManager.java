@@ -42,12 +42,12 @@ public class TImageManager {
 
 
 // TODO: Usar TImageData para simplificar o construtor
-public TImageManager (String dp, String df, String ext) {
+public TImageManager (TImageData t) {
 
 	this.size             = 0;
-	this.dir_path    	  = dp;
-	this.data_file   	  = df;
-	this.fextension  	  = ext;
+	this.dir_path    	  = t.path;
+	this.data_file   	  = t.conf_file;
+	this.fextension  	  = t.extension;
 	this.imageWidth  	  = 0;
 	this.imageHeight 	  = 0;
 	this.bg_width		  = 0;
@@ -261,7 +261,7 @@ public int getSize() {
 	return this.size;
 }
 
-
+/*
 public static void main(String argv[]) {
 
 	if (argv.length == 3) {
@@ -271,6 +271,6 @@ public static void main(String argv[]) {
 		//BufferedImageDrawer imgd = new BufferedImageDrawer(ti.getBG(), 324,155);	
 
 	}
-}
+} */
 
 }
