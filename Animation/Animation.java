@@ -23,31 +23,25 @@ public class Animation extends TimerTask {
   private int x_0;
   private int y_0;
   private int jump;
-  //The background image
+  private int height;
+  private int shift;
+  private int segment_index;
+  private int repetition_controller;
+
+  private double alpha;
+  private double delta_alpha;
+
   private Point pi;
   private Point pf;
   //lista que conterá o trajeto  
   private ArrayList<Point> point_list;
 
-
   // new try
   private BufferedImage mixedImage;
-
   private BufferedImageDrawer bid;
-
   private TImageManager tImages;
-
   private TriangulatedImage current_image;
 
-
-  private int segment_index;
-  private int shift;
-  private int repetition_controller;
-
-  private int height;
-
-  private double alpha;
-  private double delta_alpha;
 
   /**
   * Constructor
@@ -60,9 +54,7 @@ public Animation(int r, int s, int n, int x, int y, int h, BufferedImageDrawer b
   	this.repetitions   = n;
   	this.x_0           = x;  
   	this.y_0           = y;
-
     this.height        = h;
-
     this.shift         = 0;
     this.segment_index = 0;
     this.alpha         = 0;
@@ -71,25 +63,11 @@ public Animation(int r, int s, int n, int x, int y, int h, BufferedImageDrawer b
 
     this.bid = b;
 
-
-
-
-
     bid.g2dbi.setStroke(new BasicStroke(1.5f));
+    bid.g2dbi.setPaint(Color.black);
     bid.g2dbi.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON); 
-
-    //Transforma as coordenadas
-
     bid.g2dbi.transform(normalizedCoords(h));
 
-
-
-
-    bid.g2dbi.setPaint(Color.black);
-    
-
-
-    //calcula os pontos
     pi = new Point();
     pf = new Point();
     point_list = calculateBrasenham();    
@@ -108,9 +86,6 @@ public Animation(int r, int s, int n, int x, int y, int h, BufferedImageDrawer b
 @Override
 public void run() {
 
-
-
-
     if (repetitions > 0) {
 
         calculateInterpolationPoints(segment_index, shift);
@@ -122,8 +97,6 @@ public void run() {
               // Esse arredondamento ta dando problema
               int interpolated_x = (int) ((1 - alpha) * pi.get_x() + alpha * pf.get_x());
               int interpolated_y = (int) ((1 - alpha) * pi.get_y() + alpha * pf.get_y());
-
-               //System.out.format("alpha is (%.10f) at seg (%d) | i_x: %d -- i_y: %d \n",alpha , segment_index, interpolated_x, interpolated_y);
 
                mixedImage = current_image.mixWith(tImages.getNext(segment_index), alpha);
                 // background aqui
@@ -153,8 +126,6 @@ public void run() {
     } else {
         this.cancel();
     }
-
-
 
 
 
@@ -257,7 +228,7 @@ public int normalizedSegement(int s) {
 
 }
 
-public AffineTransform normalizedCoords(int height) {
+public static AffineTransform normalizedCoords(int height) {
 
 	AffineTransform normalizer = new AffineTransform();
   	normalizer.setToScale(1, -1);
@@ -297,9 +268,11 @@ public static void main(String[] argv) {
 
     //The background.
 		BufferedImage backGround = new BufferedImage(width,height,BufferedImage.TYPE_INT_RGB);
-		Image theImage = new javax.swing.ImageIcon("fundo.jpg").getImage();
+		Image theImage = new javax.swing.ImageIcon("data/fundo.jpg").getImage();
 
 		Graphics2D g2dBackGround = backGround.createGraphics();
+
+    g2dBackGround.transform(Animation.normalizedCoords(height));
 
     //The lines should have a thickness of 3.0 instead of 1.0.
 		g2dBackGround.setStroke(new BasicStroke(2.0f));
@@ -307,29 +280,14 @@ public static void main(String[] argv) {
     //The background is painted white first.
 		g2dBackGround.setPaint(Color.white);
 		g2dBackGround.fill(new Rectangle(0,0,width,height));
-		g2dBackGround.drawImage(theImage,-10,height - 155,null);	// - 155 ?
+    g2dBackGround.drawImage(theImage, (width/2) - 162 , (height/2) - 72,null);	// - 155 ?
     
     //The window in which everything is drawn.
-		BufferedImage bi = new BufferedImage(width,height,BufferedImage.TYPE_INT_RGB);
-		BufferedImageDrawer bid = new BufferedImageDrawer(bi,width,height);
+		BufferedImageDrawer bid = new BufferedImageDrawer(backGround,width,height);
 
-
-        // bid.g2dbi.setStroke(new BasicStroke(1.5f));
-        // bid.g2dbi.setPaint(Color.black);
-        // bid.g2dbi.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON); 
-
-        //Transforma as coordenadas
-
-
-
-
-    //The TimerTask in which the repeated computations drawing take place.
-        Animation scene = new Animation(radius, segments, repetitions, x_center, y_center,height, bid);
-        Timer t = new Timer();
-        // tem que normalizar os segmentos
-		t.scheduleAtFixedRate( scene, 0, delay);
-
-        //t.cancel();
+    Animation scene = new Animation(radius, segments, repetitions, x_center, y_center,height, bid);
+    Timer t = new Timer();
+  	t.scheduleAtFixedRate( scene, 0, delay);
 
 
 	}
