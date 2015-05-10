@@ -276,11 +276,18 @@ public static void main(String[] argv) {
 		g2dBackGround.setStroke(new BasicStroke(2.0f));
 	    //The background is painted white first.
 		g2dBackGround.setPaint(Color.white);
+		
+		g2dBackGround.transform(Animation.normalizedCoords(height));
+
 		g2dBackGround.fill(new Rectangle(0,0,width,height));
-	    g2dBackGround.drawImage(theImage, (width/2) - 162 , (height/2) - 72,null);	// - 155 ?
+		g2dBackGround.drawImage(theImage, (width/2) - 162 , (height/2) - 72,null);	// - 155 ?
 	    
+
+
+	    BufferedImage bi = new BufferedImage(width,height,BufferedImage.TYPE_INT_RGB);
+
 	    //The window in which everything is drawn.
-		BufferedImageDrawer bid = new BufferedImageDrawer(backGround,width,height);
+		BufferedImageDrawer bid = new BufferedImageDrawer(bi,width,height);
 
 	    Animation scene = new Animation(radius, segments, repetitions, x_center, y_center,height, bid, backGround);
 	    Timer t = new Timer();
