@@ -100,9 +100,11 @@ public void run() {
 
         for (int i = 0; i < 70; i++) {
             if (alpha >= 0 && alpha <= 1) {
-                // Interpolacao vem aqui
+                // Esse arredondamento ta dando problema
                 int interpolated_x = (int) ((1 - alpha) * pi.get_x() + alpha * pf.get_x());
                 int interpolated_y = (int) ((1 - alpha) * pi.get_y() + alpha * pf.get_y());
+
+                System.out.format("at seg (%d) | i_x: %d -- i_y: %d \n", segment_index, interpolated_x, interpolated_y);
 
                 mixedImage = current_image.mixWith(tImages.getNext(segment_index), alpha);
                 // background aqui
@@ -266,7 +268,7 @@ public static void main(String[] argv) {
 
 
     //Specifies (in milliseconds) when the quad should be updated.
-		int delay = 400;
+		int delay = 4000;
 
     //The BufferedImage to be drawn in the window.
 
