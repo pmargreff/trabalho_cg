@@ -14,7 +14,7 @@ import java.util.*;
 import java.awt.image.BufferedImage;
 
 
-public class Animation {
+public class Animation extends TimerTask {
 
 
   private int radius;     
@@ -29,30 +29,114 @@ public class Animation {
   //lista que conterá o trajeto  
   private ArrayList<Point> point_list;
 
+
+  // new try
+  private BufferedImage mixedImage;
+
+  private BufferedImageDrawer bid;
+
+  private TImageManager tImages;
+
+  private TriangulatedImage current_image;
+
+
+  private int segment_index;
+  private int shift;
+  private int repetition_controller;
+
+  private double alpha;
+  private double delta_alpha;
+
   /**
   * Constructor
   * @param bid          The buffered image to be drawn
   * @param backGround   The background (buffered) image
   */
-public Animation(int r, int s, int n, int x, int y) {
+public Animation(int r, int s, int n, int x, int y, int h, BufferedImageDrawer b) {
 
   	this.radius        = r;
   	this.repetitions   = n;
   	this.x_0           = x;  
   	this.y_0           = y;
+    this.shift         = 0;
+    this.segment_index = 0;
+    this.repetition_controller = 0;
+    this.alpha         = 0;
+    this.delta_alpha   = 1/100;     //mudar dps
+
+    this.bid = b;
+
+    //this.bid.g2dbi.transform(normalizedCoords(h));
     
+
+
     //calcula os pontos
     pi = new Point();
     pf = new Point();
-    point_list = calculateBrasenham();
-    
+    point_list = calculateBrasenham();    
     this.segments = normalizedSegement(s);
-
     pi.set_x(point_list.get(0).get_x());
-    pi.set_y(point_list.get(0).get_y());   
+    pi.set_y(point_list.get(0).get_y()); 
+
+    this.tImages = new TImageManager("data/","data/point_info" ,"jpg" , 150, 125 );  
+
+    this.current_image = this.tImages.get(0);
 
   	
-  }
+}
+
+
+
+@Override
+public void run() {
+
+    if (repetitions > 0) {
+
+        System.out.println(repetitions);
+
+        calculateInterpolationPoints(segment_index, shift);
+
+        alpha = 0;  // nao sei
+
+        for (int i = 0; i < 70; i++) {
+            if (alpha >= 0 && alpha <= 1) {
+                // Interpolacao vem aqui
+                int interpolated_x = (int) ((1 - alpha) * pi.get_x() + alpha * pf.get_x());
+                int interpolated_y = (int) ((1 - alpha) * pi.get_y() + alpha * pf.get_y());
+
+                mixedImage = current_image.mixWith(tImages.getNext(segment_index), alpha);
+                // background aqui
+                bid.g2dbi.drawImage(mixedImage,interpolated_x , interpolated_y, null);
+                bid.repaint();
+
+            } else {
+                alpha = 0;
+            }
+
+            alpha += delta_alpha;
+        }
+
+        current_image = tImages.getNext(segment_index);
+        pi.set_x(pf.get_x());
+        pi.set_y(pf.get_y());
+        segment_index = (segment_index + 1) % this.segments;
+
+
+        if (segment_index == 0) {
+            repetition_controller++;
+            repetitions--;
+            shift = repetition_controller * 2 * this.radius;
+        } 
+
+    } else {
+        this.cancel();
+    }
+
+
+}
+
+
+
   
 private ArrayList<Point> calculateBrasenham() {
 
@@ -109,13 +193,6 @@ private ArrayList<Point> calculateBrasenham() {
   	return final_list;
 }
 
-public Point getPf() {
-    return this.pf;
-}
-public Point getPi() {
-    return this.pi;
-}
-
 // pode dar pau
 // Atualiza o pf;
 public void calculateInterpolationPoints(int i ,int r ) {
@@ -166,11 +243,6 @@ public AffineTransform normalizedCoords(int height) {
   	return normalizer;
 
 }
-
-public void updateScene() {
-    this.pi = new Point(pf.get_x(), pf.get_y());
-}
-
   //o main tem que ficar aqui, 
   //não vai rodar em arquivo próprio por conflito na classe TaskTimer
   //contador_de_horas_tentando_deixar_o_main_em_um_arquivo_separado: +-8 horas
@@ -194,7 +266,7 @@ public static void main(String[] argv) {
 
 
     //Specifies (in milliseconds) when the quad should be updated.
-		int delay = 100;
+		int delay = 400;
 
     //The BufferedImage to be drawn in the window.
 
@@ -227,34 +299,12 @@ public static void main(String[] argv) {
 
 
     //The TimerTask in which the repeated computations drawing take place.
-        Animation scene = new Animation(radius, segments, repetitions, x_center, y_center);
-        bid.g2dbi.transform(scene.normalizedCoords(height));
-
-        segments = scene.normalizedSegement(segments);
-
+        Animation scene = new Animation(radius, segments, repetitions, height , x_center, y_center, bid);
         Timer t = new Timer();
         // tem que normalizar os segmentos
+		t.scheduleAtFixedRate( scene, 0, delay);
 
-
-        TImageManager tImages = new TImageManager("data/","data/point_info" ,"jpg" , 150, 125 );
-
-        int shift = 0;
-
-        TimerTask morper = null;
-
-        for (int r = 0; r < repetitions; r++) {
-            shift = radius * 2 * r;
-            for (int j = 0; j < segments; j++) { 
-                System.out.println("normal");
-                scene.calculateInterpolationPoints(j, shift);        
-                morper = new TImageMorpher(bid, tImages, scene.getPi(), scene.getPf(), delay, j);     
-        		t.scheduleAtFixedRate( morper, 0, delay);
-                morper.join();
-                scene.updateScene();
-            }
-        }
-
-        t.cancel();
+        //t.cancel();
 
 
 	}
