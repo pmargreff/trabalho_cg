@@ -38,6 +38,7 @@ public class Animation extends TimerTask {
 
   // new try
   private BufferedImage mixedImage;
+  private BufferedImage background;
   private BufferedImageDrawer bid;
   private TImageManager tImages;
   private TriangulatedImage current_image;
@@ -48,7 +49,7 @@ public class Animation extends TimerTask {
   * @param bid          The buffered image to be drawn
   * @param backGround   The background (buffered) image
   */
-public Animation(int r, int s, int n, int x, int y, int h, BufferedImageDrawer b) {
+public Animation(int r, int s, int n, int x, int y, int h, BufferedImageDrawer b, BufferedImage bg) {
 
   	this.radius        = r;
   	this.repetitions   = n;
@@ -62,6 +63,7 @@ public Animation(int r, int s, int n, int x, int y, int h, BufferedImageDrawer b
     this.repetition_controller = 0;
 
     this.bid = b;
+    this.background = bg;
 
     bid.g2dbi.setStroke(new BasicStroke(1.5f));
     bid.g2dbi.setPaint(Color.black);
@@ -100,6 +102,7 @@ public void run() {
 
                mixedImage = current_image.mixWith(tImages.getNext(segment_index), alpha);
                 // background aqui
+               bid.g2dbi.drawImage(background,0 ,0, null);
                bid.g2dbi.drawImage(mixedImage,interpolated_x ,interpolated_y, null);
                bid.repaint();
 
@@ -269,25 +272,26 @@ public static void main(String[] argv) {
     //The background.
 		BufferedImage backGround = new BufferedImage(width,height,BufferedImage.TYPE_INT_RGB);
 		Image theImage = new javax.swing.ImageIcon("data/fundo.jpg").getImage();
-
 		Graphics2D g2dBackGround = backGround.createGraphics();
-
-    g2dBackGround.transform(Animation.normalizedCoords(height));
-
-    //The lines should have a thickness of 3.0 instead of 1.0.
 		g2dBackGround.setStroke(new BasicStroke(2.0f));
-
-    //The background is painted white first.
+	    //The background is painted white first.
 		g2dBackGround.setPaint(Color.white);
-		g2dBackGround.fill(new Rectangle(0,0,width,height));
-    g2dBackGround.drawImage(theImage, (width/2) - 162 , (height/2) - 72,null);	// - 155 ?
-    
-    //The window in which everything is drawn.
-		BufferedImageDrawer bid = new BufferedImageDrawer(backGround,width,height);
+		
+		g2dBackGround.transform(Animation.normalizedCoords(height));
 
-    Animation scene = new Animation(radius, segments, repetitions, x_center, y_center,height, bid);
-    Timer t = new Timer();
-  	t.scheduleAtFixedRate( scene, 0, delay);
+		g2dBackGround.fill(new Rectangle(0,0,width,height));
+		g2dBackGround.drawImage(theImage, (width/2) - 162 , (height/2) - 72,null);	// - 155 ?
+	    
+
+
+	    BufferedImage bi = new BufferedImage(width,height,BufferedImage.TYPE_INT_RGB);
+
+	    //The window in which everything is drawn.
+		BufferedImageDrawer bid = new BufferedImageDrawer(bi,width,height);
+
+	    Animation scene = new Animation(radius, segments, repetitions, x_center, y_center,height, bid, backGround);
+	    Timer t = new Timer();
+	  	t.scheduleAtFixedRate( scene, 0, delay);
 
 
 	}
