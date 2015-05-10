@@ -10,6 +10,8 @@
 	@docs:
 		- http://www.ocpsoft.org/opensource/guide-to-regular-expressions-in-java-part-1/
 		- http://stackoverflow.com/questions/12008986/sublime-text-2-how-to-delete-blank-empty-lines
+
+	TODO: Preciso de um vetor de vetores para os triangulos;	
 		
 */
 
@@ -25,24 +27,30 @@ public class TImageManager {
 
 	private int imageHeight;
 	private int imageWidth;
+	private int bg_width;
+	private int bg_height;
 	private int size;
 	private int[][] mapped_triangles;
 	private String fextension;
 	private String dir_path;
 	private String data_file;
+	private BufferedImage bg;
 	private ArrayList<Point2D> custom_points;
 	private ArrayList<Point2D> anchor_points;
 	private ArrayList<TriangulatedImage> tImages;
 
 
-public TImageManager (String dp, String df, String ext, int w, int h) {
+// TODO: Usar TImageData para simplificar o construtor
+public TImageManager (String dp, String df, String ext) {
 
 	this.size             = 0;
 	this.dir_path    	  = dp;
 	this.data_file   	  = df;
 	this.fextension  	  = ext;
-	this.imageWidth  	  = w;
-	this.imageHeight 	  = h;
+	this.imageWidth  	  = 0;
+	this.imageHeight 	  = 0;
+	this.bg_width		  = 0;
+	this.bg_height        = 0;	
 	this.tImages          = new ArrayList<TriangulatedImage>();
 	/*
 		Por enquanto mapped_triangles esta estatico, logo, no arquivo de configuracao, tem que ter 22 obrigatoriamento; 
@@ -50,6 +58,19 @@ public TImageManager (String dp, String df, String ext, int w, int h) {
 	this.mapped_triangles = new int[22][3];
 
 	buildTImageList();
+}
+
+public BufferedImage getBG() {
+	return this.bg;
+}
+
+
+public int getBGHeight() {
+	return this.bg_height;
+}
+
+public int getBGWidth() {
+	return this.bg_width;
 }
 
 
@@ -100,7 +121,7 @@ private void buildTImageList() {
 					
 				}
 
-			} else if (line.matches("<(\\w)+>") && !line.equals("<mapped>") && !line.equals("<anchors>") ) {
+			} else if (line.matches("<(\\w)+>") && !line.equals("<mapped>") && !line.equals("<anchors>") && !line.equals("<metadata>") ) {
 
 				String image_name = line.substring(1, line.length() - 1);
 
@@ -171,7 +192,43 @@ private void buildTImageList() {
 					p_line++;
 				}
 
-			}else {
+			} else if(line.matches("<metadata>")) {
+				while((line = pointFile.readLine()) != null) {
+					if (line.matches("</metadata>")) break;
+					
+					String mdata[] = line.split(":");
+
+					switch(mdata[0]) {
+						case "bg":
+							// carrega o bd;
+							String bg_name = mdata[1];
+							bg_width   	   = Integer.parseInt(mdata[2]);
+							bg_height      = Integer.parseInt(mdata[3]);
+
+							this.bg = new BufferedImage(bg_width,bg_height,BufferedImage.TYPE_INT_RGB);
+							Image theImage = new javax.swing.ImageIcon(dir_path + bg_name + "." + fextension).getImage();
+							Graphics2D g2dBackGround = this.bg.createGraphics();
+							g2dBackGround.drawImage(theImage, 0, 0, null);
+
+						break;
+						
+						case "iWidth":
+							// Atualiza o width das imagens - deve ocorrer antes de carregar as imagens
+							imageWidth = Integer.parseInt(mdata[1]);
+						break;
+
+						case "iHeight":
+							// Atualiza o width das imagens - deve ocorrer antes de carregar as imagens	
+							imageHeight = Integer.parseInt(mdata[1]);						
+						break;
+
+					}
+
+
+
+				}
+
+			} else {
 				System.out.println("Erro de sintaxe no arquivo de mapeamento dos triangulos.");
 				break;
 			}		
@@ -198,16 +255,16 @@ public int getSize() {
 	return this.size;
 }
 
-/*
+
 public static void main(String argv[]) {
 
 	if (argv.length == 5) {
 
-		TImageManager ti = new TImageManager(argv[0], argv[1], argv[2], 150, 125 );
+		TImageManager ti = new TImageManager(argv[0], argv[1], argv[2]);
 		
-		BufferedImageDrawer imgd = new BufferedImageDrawer(ti.getNext(1).bi, 150,125);	
+		BufferedImageDrawer imgd = new BufferedImageDrawer(ti.getBG(), 324,155);	
 
 	}
-}*/
+}
 
 }
