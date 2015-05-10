@@ -21,6 +21,7 @@ import java.awt.geom.*;
 import java.awt.*;
 import java.util.*;
 import java.awt.image.BufferedImage;
+import java.util.Vector;
 
 
 public class TImageManager {
@@ -30,7 +31,6 @@ public class TImageManager {
 	private int bg_width;
 	private int bg_height;
 	private int size;
-	private int[][] mapped_triangles;
 	private String fextension;
 	private String dir_path;
 	private String data_file;
@@ -38,6 +38,7 @@ public class TImageManager {
 	private ArrayList<Point2D> custom_points;
 	private ArrayList<Point2D> anchor_points;
 	private ArrayList<TriangulatedImage> tImages;
+	private ArrayList< ArrayList<Integer> > mapped_triangles;
 
 
 // TODO: Usar TImageData para simplificar o construtor
@@ -55,7 +56,9 @@ public TImageManager (String dp, String df, String ext) {
 	/*
 		Por enquanto mapped_triangles esta estatico, logo, no arquivo de configuracao, tem que ter 22 obrigatoriamento; 
 	*/
-	this.mapped_triangles = new int[22][3];
+
+	this.mapped_triangles = new ArrayList< ArrayList<Integer> >();
+		
 
 	buildTImageList();
 }
@@ -159,14 +162,16 @@ private void buildTImageList() {
 								continuation++;
 							}
 
-							current_img.triangles = new int[22][3];		// nao sei se eh n_points : nao entendi isso aqui
-							
-							for (int j = 0; j < 22; j++) {
-								current_img.triangles[j][0] = mapped_triangles[j][0];
-								current_img.triangles[j][1] = mapped_triangles[j][1];
-								current_img.triangles[j][2] = mapped_triangles[j][2];
-							}
+							int tsize = this.mapped_triangles.size();
 
+							current_img.triangles = new int[tsize][3];		// nao sei se eh n_points : nao entendi isso aqui
+							
+							for (int j = 0; j < tsize; j++) {
+								current_img.triangles[j][0] = (int)mapped_triangles.get(j).get(0);
+								current_img.triangles[j][1] = (int)mapped_triangles.get(j).get(1);
+								current_img.triangles[j][2] = (int)mapped_triangles.get(j).get(2);
+							}
+							
 						}
 
 						this.size++;	// Prepara para a proxima imagem/triangulacao
@@ -179,17 +184,18 @@ private void buildTImageList() {
 				}
 
 			} else if(line.matches("<mapped>")) {							
-				int p_line = 0;
 				while((line = pointFile.readLine()) != null) {
 					if (line.matches("</mapped>")) break;
 					
 					String mPoints[] = line.split(" ");
 
-					this.mapped_triangles[p_line][0] = Integer.parseInt(mPoints[0]);
-					this.mapped_triangles[p_line][1] = Integer.parseInt(mPoints[1]);
-					this.mapped_triangles[p_line][2] = Integer.parseInt(mPoints[2]);
+					ArrayList<Integer> tpts = new ArrayList<Integer>();
 
-					p_line++;
+					tpts.add(Integer.parseInt(mPoints[0]));
+					tpts.add(Integer.parseInt(mPoints[1]));
+					tpts.add(Integer.parseInt(mPoints[2]));
+					this.mapped_triangles.add(tpts);
+
 				}
 
 			} else if(line.matches("<metadata>")) {
@@ -258,11 +264,11 @@ public int getSize() {
 
 public static void main(String argv[]) {
 
-	if (argv.length == 5) {
+	if (argv.length == 3) {
 
 		TImageManager ti = new TImageManager(argv[0], argv[1], argv[2]);
 		
-		BufferedImageDrawer imgd = new BufferedImageDrawer(ti.getBG(), 324,155);	
+		//BufferedImageDrawer imgd = new BufferedImageDrawer(ti.getBG(), 324,155);	
 
 	}
 }
