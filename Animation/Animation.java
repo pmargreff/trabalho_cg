@@ -44,6 +44,8 @@ public class Animation extends TimerTask {
   private int shift;
   private int repetition_controller;
 
+  private int height;
+
   private double alpha;
   private double delta_alpha;
 
@@ -58,15 +60,32 @@ public Animation(int r, int s, int n, int x, int y, int h, BufferedImageDrawer b
   	this.repetitions   = n;
   	this.x_0           = x;  
   	this.y_0           = y;
+
+    this.height        = h;
+
     this.shift         = 0;
     this.segment_index = 0;
-    this.repetition_controller = 0;
     this.alpha         = 0;
-    this.delta_alpha   = 1/100;     //mudar dps
+    this.delta_alpha   = 1f/100f;     //mudar dps
+    this.repetition_controller = 0;
 
     this.bid = b;
 
-    //this.bid.g2dbi.transform(normalizedCoords(h));
+
+
+
+
+    bid.g2dbi.setStroke(new BasicStroke(1.5f));
+    bid.g2dbi.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON); 
+
+    //Transforma as coordenadas
+
+    bid.g2dbi.transform(normalizedCoords(h));
+
+
+
+
+    bid.g2dbi.setPaint(Color.black);
     
 
 
@@ -81,7 +100,6 @@ public Animation(int r, int s, int n, int x, int y, int h, BufferedImageDrawer b
     this.tImages = new TImageManager("data/","data/point_info" ,"jpg" , 150, 125 );  
 
     this.current_image = this.tImages.get(0);
-
   	
 }
 
@@ -90,32 +108,34 @@ public Animation(int r, int s, int n, int x, int y, int h, BufferedImageDrawer b
 @Override
 public void run() {
 
-    if (repetitions > 0) {
 
-        System.out.println(repetitions);
+
+
+    if (repetitions > 0) {
 
         calculateInterpolationPoints(segment_index, shift);
 
         alpha = 0;  // nao sei
 
         for (int i = 0; i < 70; i++) {
-            if (alpha >= 0 && alpha <= 1) {
-                // Esse arredondamento ta dando problema
-                int interpolated_x = (int) ((1 - alpha) * pi.get_x() + alpha * pf.get_x());
-                int interpolated_y = (int) ((1 - alpha) * pi.get_y() + alpha * pf.get_y());
+            if (alpha >= 0f && alpha <= 1f) {
+              // Esse arredondamento ta dando problema
+              int interpolated_x = (int) ((1 - alpha) * pi.get_x() + alpha * pf.get_x());
+              int interpolated_y = (int) ((1 - alpha) * pi.get_y() + alpha * pf.get_y());
 
-                System.out.format("at seg (%d) | i_x: %d -- i_y: %d \n", segment_index, interpolated_x, interpolated_y);
+               //System.out.format("alpha is (%.10f) at seg (%d) | i_x: %d -- i_y: %d \n",alpha , segment_index, interpolated_x, interpolated_y);
 
-                mixedImage = current_image.mixWith(tImages.getNext(segment_index), alpha);
+               mixedImage = current_image.mixWith(tImages.getNext(segment_index), alpha);
                 // background aqui
-                bid.g2dbi.drawImage(mixedImage,interpolated_x , interpolated_y, null);
-                bid.repaint();
+               bid.g2dbi.drawImage(mixedImage,interpolated_x ,interpolated_y, null);
+               bid.repaint();
 
             } else {
                 alpha = 0;
             }
 
             alpha += delta_alpha;
+
         }
 
         current_image = tImages.getNext(segment_index);
@@ -133,6 +153,9 @@ public void run() {
     } else {
         this.cancel();
     }
+
+
+
 
 
 }
@@ -268,7 +291,7 @@ public static void main(String[] argv) {
 
 
     //Specifies (in milliseconds) when the quad should be updated.
-		int delay = 4000;
+		int delay = 200;
 
     //The BufferedImage to be drawn in the window.
 
@@ -291,9 +314,9 @@ public static void main(String[] argv) {
 		BufferedImageDrawer bid = new BufferedImageDrawer(bi,width,height);
 
 
-        bid.g2dbi.setStroke(new BasicStroke(1.5f));
-        bid.g2dbi.setPaint(Color.black);
-        bid.g2dbi.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON); 
+        // bid.g2dbi.setStroke(new BasicStroke(1.5f));
+        // bid.g2dbi.setPaint(Color.black);
+        // bid.g2dbi.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON); 
 
         //Transforma as coordenadas
 
@@ -301,7 +324,7 @@ public static void main(String[] argv) {
 
 
     //The TimerTask in which the repeated computations drawing take place.
-        Animation scene = new Animation(radius, segments, repetitions, height , x_center, y_center, bid);
+        Animation scene = new Animation(radius, segments, repetitions, x_center, y_center,height, bid);
         Timer t = new Timer();
         // tem que normalizar os segmentos
 		t.scheduleAtFixedRate( scene, 0, delay);
