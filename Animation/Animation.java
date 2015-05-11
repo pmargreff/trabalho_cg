@@ -275,8 +275,8 @@ public static void main(String[] argv) {
 		String conff    = argv[6];
 		
 
-		int width  = radius * 2 * repetitions + 150 + x_center;
-		int height = radius + y_center + 150;
+		int width  = radius * 2 * repetitions + 250 + x_center;
+		int height = radius + y_center + 250;
 
 		x_center = x_center - radius;
 

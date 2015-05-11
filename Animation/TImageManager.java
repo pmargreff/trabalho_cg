@@ -99,7 +99,7 @@ private TriangulatedImage createTImage(String imgName) {
 	Image loadedImage = new javax.swing.ImageIcon(imgName).getImage();
 
 	TriangulatedImage tmp = new TriangulatedImage();
-	tmp.bi = new BufferedImage(imageWidth,imageHeight, BufferedImage.TYPE_INT_RGB);
+	tmp.bi = new BufferedImage(this.imageWidth,this.imageHeight, BufferedImage.TYPE_INT_RGB);
 	tmp.g2dbi = tmp.bi.createGraphics();
 	tmp.g2dbi.transform(normalizedCoords(imageHeight));  // coloca as imagens em sua coordenada correta;
 	tmp.g2dbi.drawImage(loadedImage, 0,0,null);		  // Desenha na imagem bufferizada a imagem carregada	
@@ -229,7 +229,7 @@ private void buildTImageList() {
 							imageWidth = Integer.parseInt(mdata[1]);
 						break;
 
-						case "iHeight":
+						case "iHeigth":
 							// Atualiza o width das imagens - deve ocorrer antes de carregar as imagens	
 							imageHeight = Integer.parseInt(mdata[1]);						
 						break;
