@@ -50,7 +50,7 @@ public class Animation extends TimerTask {
   * @param bid          The buffered image to be drawn
   * @param backGround   The background (buffered) image
   */
-public Animation(int r, int s, int n, int x, int y, int h, BufferedImageDrawer b, BufferedImage bg, TImageData t) {
+public Animation(int r, int s, int n, int x, int y, int w, int h, BufferedImageDrawer b, TImageData t) {
 
   	this.radius        = r;
   	this.repetitions   = n;
@@ -65,7 +65,6 @@ public Animation(int r, int s, int n, int x, int y, int h, BufferedImageDrawer b
 
 
     this.bid = b;
-    this.background = bg;
 
     bid.g2dbi.setStroke(new BasicStroke(1.5f));
     bid.g2dbi.setPaint(Color.black);
@@ -79,7 +78,22 @@ public Animation(int r, int s, int n, int x, int y, int h, BufferedImageDrawer b
     pi.set_x(point_list.get(0).get_x());
     pi.set_y(point_list.get(0).get_y()); 
 
-    this.tImages = new TImageManager(t.path,t.conf_file ,t.extension , t.imageWidth, t.imageHeight );  
+    this.tImages = new TImageManager(t);  
+    
+    this.background = new BufferedImage(w,height,BufferedImage.TYPE_INT_RGB);
+    int bg_height = this.tImages.getBGHeight();
+    int bg_width  = this.tImages.getBGWidth();
+
+    Graphics2D g2dBackGround = this.background.createGraphics();
+
+    g2dBackGround.transform(normalizedCoords(height));
+    g2dBackGround.setStroke(new BasicStroke(2.0f));
+    g2dBackGround.setPaint(Color.white);
+    //g2dBackGround.transform(normalizedCoords(height));
+
+    g2dBackGround.fill(new Rectangle(0,0,w,height));
+    g2dBackGround.drawImage(this.tImages.getBG(), (w/2) - (bg_width/2), (height/2) - (bg_height/2),null);  // - 155 ?
+
 
     this.current_image = this.tImages.get(0);
   	
@@ -270,32 +284,15 @@ public static void main(String[] argv) {
 		if ( repetitions < 1 ) repetitions = 1;
 		if ( radius < 2 ) radius = 2;
 
-
-    //Specifies (in milliseconds) when the quad should be updated.
-
-    //The BufferedImage to be drawn in the window.
-
-    //The background.
-		BufferedImage backGround = new BufferedImage(width,height,BufferedImage.TYPE_INT_RGB);
-		Image theImage = new javax.swing.ImageIcon("data/fundo.jpg").getImage();
-		Graphics2D g2dBackGround = backGround.createGraphics();
-		g2dBackGround.setStroke(new BasicStroke(2.0f));
-	    //The background is painted white first.
-		g2dBackGround.setPaint(Color.white);
-
-		g2dBackGround.transform(Animation.normalizedCoords(height));
-
-		g2dBackGround.fill(new Rectangle(0,0,width,height));
-		g2dBackGround.drawImage(theImage, (width/2) - 162 , (height/2) - 72,null);	// - 155 ?
-	    
+ 
 
 
 	    BufferedImage bi = new BufferedImage(width,height,BufferedImage.TYPE_INT_RGB);
 
 	    //The window in which everything is drawn.
-		BufferedImageDrawer bid = new BufferedImageDrawer(bi,width,height);
+  		BufferedImageDrawer bid = new BufferedImageDrawer(bi,width,height);
 
-	    Animation scene = new Animation(radius, segments, repetitions, x_center, y_center,height, bid, backGround, new TImageData(path, conff, "jpg", 150, 125));
+	    Animation scene = new Animation(radius, segments, repetitions, x_center, y_center, width, height, bid, new TImageData(path, conff, "jpg"));
 	    Timer t = new Timer();
 	  	t.scheduleAtFixedRate( scene, 0, delay);
 

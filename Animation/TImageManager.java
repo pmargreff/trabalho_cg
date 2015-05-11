@@ -35,6 +35,7 @@ public class TImageManager {
 	private String dir_path;
 	private String data_file;
 	private BufferedImage bg;
+	public Graphics2D g2dBackGround;
 	private ArrayList<Point2D> custom_points;
 	private ArrayList<Point2D> anchor_points;
 	private ArrayList<TriangulatedImage> tImages;
@@ -65,6 +66,10 @@ public TImageManager (TImageData t) {
 
 public BufferedImage getBG() {
 	return this.bg;
+}
+
+public Graphics2D getBGDrawer() {
+	return this.g2dBackGround;
 }
 
 
@@ -213,7 +218,8 @@ private void buildTImageList() {
 
 							this.bg = new BufferedImage(bg_width,bg_height,BufferedImage.TYPE_INT_RGB);
 							Image theImage = new javax.swing.ImageIcon(dir_path + bg_name + "." + fextension).getImage();
-							Graphics2D g2dBackGround = this.bg.createGraphics();
+							g2dBackGround = this.bg.createGraphics();
+							//g2dBackGround.transform(normalizedCoords(bg_height));
 							g2dBackGround.drawImage(theImage, 0, 0, null);
 
 						break;
