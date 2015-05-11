@@ -284,8 +284,6 @@ public static void main(String[] argv) {
 		if ( repetitions < 1 ) repetitions = 1;
 		if ( radius < 2 ) radius = 2;
 
- 
-
 
 	    BufferedImage bi = new BufferedImage(width,height,BufferedImage.TYPE_INT_RGB);
 
