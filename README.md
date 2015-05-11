@@ -16,3 +16,13 @@ java Main 15 5 5 30 10
 java Main 200 19 2 210 10
 java Main 150 2 3 160 20
 java Main 500 250 1 520 20
+
+Formato do arquivo data/point_list
+0 à 9 - "Ponto âncora"
+   10 - testa
+   11 - olho osquerdo
+   12 - olho direito
+   13 - lábio superior
+   14 - queixo
+   15 - ombro esquerdo 
+   16 - ombro direito
